@@ -19,12 +19,12 @@ router.get('/:id', async (req, res) => {
 })
 
 router.post('/register', async (req, res) => {
-  const { email, password, phone } = req.body 
+  const { name, email, password, phone } = req.body 
   if (email && password && phone) {
     let hashedPassword = bcrypt.hashSync(password, 8)
 
     try {
-      let { rows } = await db.query('INSERT INTO "user" (email, password, phone_num) VALUES($1, $2, $3) RETURNING *', [email, hashedPassword, phone])
+      let { rows } = await db.query('INSERT INTO "user" (name, email, password, phone_num) VALUES($1, $2, $3, $4) RETURNING *', [name, email, hashedPassword, phone])
       let userId = rows[0].user_id
 
       let token = jwt.sign({id: userId}, process.env.SESSION_SECRET, {
