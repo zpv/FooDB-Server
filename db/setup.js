@@ -21,6 +21,7 @@ module.exports = async () => {
   await db.query(`CREATE TABLE "restaurant"
     (
       restaurant_id	INTEGER NOT NULL,
+      name  VARCHAR(45),
       address	VARCHAR(45),
       owner		VARCHAR(45),
       category VARCHAR(45),
@@ -32,7 +33,8 @@ module.exports = async () => {
     );
   `)
 
-  await db.query(`INSERT INTO "restaurant" (restaurant_id, address, owner, category, rating, lat, lon)
-    VALUES  ('1', '4779 Gothard St', 'Steven', 'Fast Food', 4.54, 0, 0)
+  await db.query(`INSERT INTO "restaurant" (restaurant_id, name, address, owner, category, rating, lat, lon)
+    VALUES  ('1',  'SteveCafe', '4779 Gothard St','Steven', 'Fast Food', 4.54, 0, 0),
+            ('2', 'Mercante' ,'6388 University Blvd', 'UBCFood', 'Fast Food', 3.10, 0, 0)
 `)
 }

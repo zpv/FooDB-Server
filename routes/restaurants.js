@@ -12,5 +12,5 @@ module.exports = router
 
 router.get('/list', async (req, res) => {
   const { rows } = await db.query('SELECT * FROM restaurant') // SHOULD USE VIEW
-  res.send(rows[0])
+  res.send(rows)
 })
