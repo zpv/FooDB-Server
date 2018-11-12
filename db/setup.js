@@ -5,12 +5,12 @@ module.exports = async () => {
 
   await db.query(`CREATE TABLE "user"
     (
-      user_id	INTEGER NOT NULL,
+      user_id	SERIAL,
       address	VARCHAR(45),
       name		VARCHAR(45),
-      email VARCHAR(45),
-      password CHAR(60),
-      phone_num	INTEGER NOT NULL,
+      email VARCHAR(45) NOT NULL UNIQUE,
+      password CHAR(60) NOT NULL,
+      phone_num	VARCHAR(10),
       lat		DECIMAL(9,6),
       lon		DECIMAL(9,6),
     
