@@ -85,7 +85,7 @@ module.exports = async () => {
         ON DELETE CASCADE
     );`)
 
-  // TODO: changed datatype for license plate, string makes more sense, made changes to vehicle table, had to add UNIQUE for some reason
+  // TODO: string makes more sense, made changes to vehicle table, had to add UNIQUE for some reason
   await db.query(`CREATE TABLE "vehicle"
     (
       deliverer_id    INTEGER NOT NULL,
