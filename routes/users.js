@@ -12,10 +12,19 @@ const router = new Router()
 // export our router to be mounted by the parent application
 module.exports = router
 
-router.get('/:id', async (req, res) => {
-  const { id } = req.params
-  const { rows } = await db.query('SELECT * FROM user WHERE user_id = $1', [id])
-  res.send(rows[0])
+router.get('/', async (req, res) => {
+  const token = req.headers['authorization']
+  console.log("test")
+  if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
+  
+  try {
+    const {id} = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET)
+    const { rows } = await db.query('SELECT name, email, phone_num FROM "user" WHERE user_id = $1', [id])
+    res.send(rows[0])
+  } catch (e) {
+    console.log(e)
+    return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+  }
 })
 
 router.post('/register', async (req, res) => {
@@ -35,8 +44,8 @@ router.post('/register', async (req, res) => {
     } catch (e) {
       console.log(e)
       if (e.routine == '_bt_check_unique')
-        return res.status(409).send('User with the same email already exists.')
-      res.status(500).send('There was a problem creating your account.')
+        return res.status(409).send({auth: false, error: 'User with the same email already exists.'})
+      res.status(500).send({auth: false, error: 'There was an error creating your account.'})
     }
   }
 })

@@ -10,7 +10,20 @@ const router = new Router()
 // export our router to be mounted by the parent application
 module.exports = router
 
-router.get('/list', async (req, res) => {
-  const { rows } = await db.query('SELECT * FROM restaurant') // SHOULD USE VIEW
-  res.send(rows)
+router.get('/:id/menu-items', async (req, res) => {
+    const { id } = req.params
+    const { rows } = await db.query('SELECT * FROM menu_item WHERE restaurant_id = $1', [id])
+    res.send(rows)
 })
+
+router.get('/list', async (req, res) => {
+    const { rows } = await db.query('SELECT * FROM restaurant') // SHOULD USE VIEW THAT SHOWS ONLY HOURS,ADDRESS, RATING
+    res.send(rows)
+  })
+
+router.get('/:id', async (req, res) => {
+    const { id } = req.params
+    const { rows } = await db.query('SELECT name, rating FROM restaurant WHERE restaurant_id = $1', [id])
+    res.send(rows[0])
+})
+
