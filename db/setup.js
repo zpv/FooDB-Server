@@ -218,10 +218,6 @@ module.exports = async () => {
     VALUES  ('1',  'Steveston Fisher', '4779 Gothard St','Steven', 'Fast Food', 4.54, 0, 0),
             ('2', 'Mercante' ,'6388 University Blvd', 'UBCFood', 'Fast Food', 3.10, 0, 0);`)
 
-  await db.query(`INSERT INTO "deliverer" (deliverer_id, lat, lon)
-    VALUES  ('1', '1', 0, 0),
-            ('2', '0', 0, 0);`)
-
   await db.query(`INSERT INTO "menu_item" (name, restaurant_id, availability, has_allergens, description, price, type)
     VALUES  ('Fish Filet', 1, true, true, 'Delicious fish filet', 24.54, 'Seafood'),
             ('Fish Sticks', 1, true, true, 'Delicious sticks of fish', 13.21, 'Seafood'),
