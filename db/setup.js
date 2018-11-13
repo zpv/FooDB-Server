@@ -2,7 +2,7 @@ const db = require('./index.js')
 
 module.exports = async () => {
   await db.query(`DROP TABLE IF EXISTS "user", "restaurant", "menu_item", "deliverer", "drone", "driver", "drives", \
-  "vehicle", "order", "order_item", "payment_info", "review", "restaurant_review", "deliverer_review"`)
+  "vehicle", "order", "order_item", "payment_info", "restaurant_review", "deliverer_review"`)
 
   await db.query(`CREATE TABLE "user"
     (
@@ -173,44 +173,38 @@ module.exports = async () => {
         ON DELETE CASCADE
     );`)
 
-  await db.query(`CREATE TABLE "review"
-    (
-      review_id 		INTEGER NOT NULL,
-      user_id   		INTEGER NOT NULL,
-      review_datetime	TIMESTAMP,
-      stars   			SMALLINT NOT NULL,
-
-
-      PRIMARY KEY (review_id),
-      FOREIGN KEY (user_id)
-        REFERENCES "user"(user_id)
-    );`)
-
   await db.query(`CREATE TABLE "restaurant_review"
     (
       review_id 		  INTEGER NOT NULL,
       restaurant_id   INTEGER NOT NULL,
+      user_id   		INTEGER NOT NULL,
+      stars   			SMALLINT NOT NULL,
       content       	VARCHAR(300),
+      review_datetime	TIMESTAMP,
 
-      PRIMARY KEY (review_id, restaurant_id),
-      FOREIGN KEY (review_id)
-        REFERENCES "review"(review_id),
+
+      PRIMARY KEY (restaurant_id, review_id),
       FOREIGN KEY (restaurant_id)
         REFERENCES "restaurant"(restaurant_id)
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+      FOREIGN KEY (user_id)
+        REFERENCES "user"(user_id)
     );`)
 
   await db.query(`CREATE TABLE "deliverer_review"
     (
-      review_id 		  INTEGER NOT NULL,
       deliverer_id   INTEGER NOT NULL,
+      review_id 		  INTEGER NOT NULL,
+      user_id   		INTEGER NOT NULL,
+      stars   			SMALLINT NOT NULL,
+      review_datetime	TIMESTAMP,
 
-      PRIMARY KEY (review_id, deliverer_id),
-      FOREIGN KEY (review_id)
-        REFERENCES "review"(review_id),
+      PRIMARY KEY (deliverer_id, review_id),
       FOREIGN KEY (deliverer_id)
         REFERENCES "deliverer"(deliverer_id)
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+      FOREIGN KEY (user_id)
+        REFERENCES "user"(user_id)
     );`)
 
 
@@ -226,4 +220,9 @@ module.exports = async () => {
             ('Crepe', 1, true, true, 'Delicious crepe', 2.54, 'Pastries'),
             ('Fancy Pizza', 2, true, true, 'Overpriced pizza', 12.10, 'Pizza'),
             ('Fancy Pizza 2', 2, true, true, 'Overpriced pizza 2', 15.60, 'Pizza')`)
+
+  await db.query(`INSERT INTO "user" (name, email, password) VALUES ('Steven Zhao', 'steven@zhao.io', '$2a$08$undNp20HMxGoZix1k79uMODYeKE7Z7CDkfmkGKe7HfagyRbbryJQq')`)
+
+  await db.query(`INSERT INTO "restaurant_review" (review_id, restaurant_id, user_id, stars, content)
+    VALUES  (1, 1, 1, 2.5, 'It is an okay restaurant with okay food.')`)
 }
