@@ -1,7 +1,8 @@
 const db = require('./index.js')
 
 module.exports = async () => {
-  await db.query(`DROP TABLE IF EXISTS "user", "restaurant", "menu_item", "deliverer", "drone", "driver", "drives", "vehicle", "order", "order_item", "payment_info", "review", "restaurant_review", "deliverer_review"`)
+  await db.query(`DROP TABLE IF EXISTS "user", "restaurant", "menu_item", "deliverer", "drone", "driver", "drives", \
+  "vehicle", "order", "order_item", "payment_info", "review", "restaurant_review", "deliverer_review"`)
 
   await db.query(`CREATE TABLE "user"
     (
