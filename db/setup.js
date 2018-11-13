@@ -1,7 +1,7 @@
 const db = require('./index.js')
 
 module.exports = async () => {
-  await db.query(`DROP TABLE IF EXISTS "user", "restaurant", "menu_item"`)
+  await db.query(`DROP TABLE IF EXISTS "user", "restaurant", "menu_item", "deliverer", "drone"`)
 
   await db.query(`CREATE TABLE "user"
     (
@@ -49,6 +49,30 @@ module.exports = async () => {
         ON DELETE CASCADE
         ON UPDATE CASCADE
     );`)
+
+  await db.query(`CREATE TABLE "deliverer"
+    (
+      deliverer_id INTEGER NOT NULL,
+      lat DECIMAL(9,6),
+      lon DECIMAL(9,6),
+    
+      PRIMARY KEY (deliverer_id)
+    );
+  `)
+
+  await db.query(`CREATE TABLE "drone"
+    (
+      deliverer_id INTEGER NOT NULL,
+      model   VARCHAR(45),
+      battery INTEGER,
+
+      PRIMARY KEY (deliverer_id),
+      FOREIGN KEY (deliverer_id)
+        REFERENCES "restaurant"(restaurant_id)
+        ON DELETE CASCADE
+    );`)
+
+
 
   await db.query(`INSERT INTO "restaurant" (restaurant_id, name, address, owner, category, rating, lat, lon)
     VALUES  ('1',  'Steveston Fisher', '4779 Gothard St','Steven', 'Fast Food', 4.54, 0, 0),
