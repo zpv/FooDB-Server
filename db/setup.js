@@ -1,8 +1,8 @@
 const db = require('./index.js')
 
 module.exports = async () => {
-  await db.query(`DROP TABLE IF EXISTS "user", "restaurant", "menu_item", "deliverer", "drone", "driver", "drives", \
-  "vehicle", "order", "order_item", "payment_info", "review", "restaurant_review", "deliverer_review"`)
+  await db.query(`DROP TABLE IF EXISTS "user", "restaurant", "menu_item", "driver", "drives", \
+  "vehicle", "order", "order_item", "payment_info", "review", "restaurant_review", "driver_review"`)
 
   await db.query(`CREATE TABLE "user"
     (
@@ -51,44 +51,22 @@ module.exports = async () => {
         ON UPDATE CASCADE
     );`)
 
-  await db.query(`CREATE TABLE "deliverer"
-    (
-      deliverer_id INTEGER NOT NULL,
-      lat DECIMAL(9,6),
-      lon DECIMAL(9,6),
-    
-      PRIMARY KEY (deliverer_id)
-    );
-  `)
-
-  await db.query(`CREATE TABLE "drone"
-    (
-      deliverer_id INTEGER NOT NULL,
-      model   VARCHAR(45),
-      battery INTEGER,
-
-      PRIMARY KEY (deliverer_id),
-      FOREIGN KEY (deliverer_id)
-        REFERENCES "deliverer"(deliverer_id)
-        ON DELETE CASCADE
-    );`)
 
   await db.query(`CREATE TABLE "driver"
     (
-      deliverer_id INTEGER NOT NULL,
+      driver_id INTEGER NOT NULL,
       name      VARCHAR(45),
       phone_num VARCHAR(45),
+      lat DECIMAL(9,6),
+      lon DECIMAL(9,6),
 
-      PRIMARY KEY (deliverer_id),
-      FOREIGN KEY (deliverer_id)
-        REFERENCES "deliverer"(deliverer_id)
-        ON DELETE CASCADE
+      PRIMARY KEY (driver_id)
     );`)
 
   // TODO: string makes more sense, made changes to vehicle table, had to add UNIQUE for some reason
   await db.query(`CREATE TABLE "vehicle"
     (
-      deliverer_id    INTEGER NOT NULL,
+      driver_id    INTEGER NOT NULL,
       vin             VARCHAR(45),
       license_plate   VARCHAR(45),
       make            VARCHAR(45),
@@ -96,23 +74,23 @@ module.exports = async () => {
       color           VARCHAR(45),
       year            VARCHAR(45),
 
-      PRIMARY KEY (deliverer_id, vin),
+      PRIMARY KEY (driver_id, vin),
       UNIQUE(vin),
-      FOREIGN KEY (deliverer_id)
-        REFERENCES "deliverer"(deliverer_id)
+      FOREIGN KEY (driver_id)
+        REFERENCES "driver"(driver_id)
         ON DELETE CASCADE
     );`)
 
   // TODO: changed datatype for vin, string makes more sense
   await db.query(`CREATE TABLE "drives"
     (
-      deliverer_id INTEGER NOT NULL,
+      driver_id INTEGER NOT NULL,
       vin       VARCHAR(45),
       since     TIMESTAMP,
 
-      PRIMARY KEY (deliverer_id),
-      FOREIGN KEY (deliverer_id)
-        REFERENCES "deliverer"(deliverer_id)
+      PRIMARY KEY (driver_id),
+      FOREIGN KEY (driver_id)
+        REFERENCES "driver"(driver_id)
         ON DELETE CASCADE,
       FOREIGN KEY (vin)
         REFERENCES "vehicle"(vin)
@@ -121,7 +99,7 @@ module.exports = async () => {
   await db.query(`CREATE TABLE "order"
     (
       order_id          INTEGER NOT NULL,
-      deliverer_id      INTEGER,
+      driver_id         INTEGER,
       user_id           INTEGER NOT NULL,
       restaurant_id     INTEGER,
       address           VARCHAR(45),
@@ -131,8 +109,8 @@ module.exports = async () => {
       special_instructions VARCHAR(300),
 
       PRIMARY KEY (order_id),
-      FOREIGN KEY (deliverer_id)
-        REFERENCES "deliverer"(deliverer_id),
+      FOREIGN KEY (driver_id)
+        REFERENCES "driver"(driver_id),
       FOREIGN KEY (user_id)
         REFERENCES "user"(user_id)
         ON DELETE CASCADE,
@@ -200,16 +178,16 @@ module.exports = async () => {
         ON DELETE CASCADE
     );`)
 
-  await db.query(`CREATE TABLE "deliverer_review"
+  await db.query(`CREATE TABLE "driver_review"
     (
       review_id 		  INTEGER NOT NULL,
-      deliverer_id   INTEGER NOT NULL,
+      driver_id   INTEGER NOT NULL,
 
-      PRIMARY KEY (review_id, deliverer_id),
+      PRIMARY KEY (review_id, driver_id),
       FOREIGN KEY (review_id)
         REFERENCES "review"(review_id),
-      FOREIGN KEY (deliverer_id)
-        REFERENCES "deliverer"(deliverer_id)
+      FOREIGN KEY (driver_id)
+        REFERENCES "driver"(driver_id)
         ON DELETE CASCADE
     );`)
 
@@ -217,6 +195,10 @@ module.exports = async () => {
   await db.query(`INSERT INTO "restaurant" (restaurant_id, name, address, owner, category, rating, lat, lon)
     VALUES  ('1',  'Steveston Fisher', '4779 Gothard St','Steven', 'Fast Food', 4.54, 0, 0),
             ('2', 'Mercante' ,'6388 University Blvd', 'UBCFood', 'Fast Food', 3.10, 0, 0);`)
+
+  await db.query(`INSERT INTO "driver" (driver_id, name, phone_num, lat, lon)
+    VALUES  ('1', 'Josh', '7789195177', '0', '0'),
+            ('2', 'James', '6043211123', '0', '0');`)
 
   await db.query(`INSERT INTO "menu_item" (name, restaurant_id, availability, has_allergens, description, price, type)
     VALUES  ('Fish Filet', 1, true, true, 'Delicious fish filet', 24.54, 'Seafood'),
