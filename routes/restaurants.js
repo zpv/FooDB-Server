@@ -26,4 +26,10 @@ router.get('/:id', async (req, res) => {
     const { rows } = await db.query('SELECT name, rating FROM restaurant WHERE restaurant_id = $1', [id])
     res.send(rows[0])
 })
+// router.post('/review', async (req, res) => {
+//     const { rows } = await db.query('INSERT INTO restaurant')
+// })
+router.get('/review', async (req, res) => {
+    const { rows } = await db.query('SELECT rating FROM restaurant');
+})
 
