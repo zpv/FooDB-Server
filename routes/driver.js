@@ -27,3 +27,13 @@ router.get('/:id/vehicles', async (req, res) => {
   const { rows } = await db.query('SELECT vin, license_plate, make, model, color, year FROM vehicle WHERE driver_id = $1', [id])
   res.send(rows[0])
 })
+
+router.get('/:id/since', async (req, res) => {
+  const { id } = req.params
+  const { rows } = await db.query('SELECT name, phone_num, license_plate, make, model, color, year, since' +
+    ' FROM driver D, drives DR, vehicle V' +
+    ' WHERE D.driver_id = DR.driver_id AND' +
+    ' DR.driver_id = V.driver_id AND' +
+    ' D.driver_id = $1', [id])
+  res.send(rows[0])
+})

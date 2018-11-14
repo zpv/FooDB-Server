@@ -82,19 +82,20 @@ module.exports = async () => {
         ON DELETE CASCADE
     );`)
 
-  // TODO: changed datatype for vin, string makes more sense
+  // TODO: changed datatype for vin, string makes more sense, two primary keys
   await db.query(`CREATE TABLE "drives"
     (
       driver_id INTEGER NOT NULL,
       vin       VARCHAR(45),
       since     TIMESTAMP,
 
-      PRIMARY KEY (driver_id),
+      PRIMARY KEY (driver_id, vin),
       FOREIGN KEY (driver_id)
         REFERENCES "driver"(driver_id)
         ON DELETE CASCADE,
       FOREIGN KEY (vin)
         REFERENCES "vehicle"(vin)
+        ON DELETE CASCADE
     );`)
 
   await db.query(`CREATE TABLE "order"
@@ -199,6 +200,11 @@ module.exports = async () => {
     VALUES  ('1', '123456-0', 'AB1234', 'Toyota', 'Corrola', 'Red', '2007'),
             ('1', '123456-1', 'AB1235', 'Honda', 'Accord', 'Black', '2009'),
             ('2', '223456-0', 'CB1235', 'Audi', 'A4', 'White', '2017');`)
+
+  await db.query(`INSERT INTO "drives" (driver_id, vin, since)
+    VALUES  ('1', '123456-0', '2016-06-22 19:10:25-07'),
+            ('1', '123456-1', '2015-06-22 19:10:25-07'),
+            ('2', '223456-0', '2016-07-22 19:10:25-07');`)
 
   await db.query(`INSERT INTO "menu_item" (name, restaurant_id, availability, has_allergens, description, price, type)
     VALUES  ('Fish Filet', 1, true, true, 'Delicious fish filet', 24.54, 'Seafood'),
