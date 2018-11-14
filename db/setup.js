@@ -156,13 +156,13 @@ module.exports = async () => {
 
   await db.query(`CREATE TABLE "restaurant_review"
     (
-      review_id 		  INTEGER NOT NULL,
+      review_id 		  SERIAL,
       restaurant_id   INTEGER NOT NULL,
       user_id   		INTEGER NOT NULL,
       stars   			SMALLINT NOT NULL,
-      content       	VARCHAR(300),
+      title           VARCHAR(150),
+      content       	TEXT,
       review_datetime	TIMESTAMP,
-
 
       PRIMARY KEY (restaurant_id, review_id),
       FOREIGN KEY (restaurant_id)
@@ -218,6 +218,16 @@ module.exports = async () => {
 
   await db.query(`INSERT INTO "user" (name, email, password) VALUES ('Steven Zhao', 'steven@zhao.io', '$2a$08$undNp20HMxGoZix1k79uMODYeKE7Z7CDkfmkGKe7HfagyRbbryJQq')`)
 
-  await db.query(`INSERT INTO "restaurant_review" (review_id, restaurant_id, user_id, stars, content)
-    VALUES  (1, 1, 1, 2.5, 'It is an okay restaurant with okay food.')`)
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+    VALUES  (1, 1, 3, 'Decent food. Very okay.', 'It is an okay restaurant with okay food. It could have been better. 
+    The broth is flavorful (without resorting to too much salt & oil), the chashu is flavorful & thin & fatty, and the noodles are made inhouse. 
+    
+    There is pretty much nothing else on the menu - this is a purist, traditional operation here. 
+    
+    The modern style thin noodles are not my top preference, but it is more popular these days.
+    ')`)
+
+    await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+    VALUES  (1, 1, 5, 'Savoury. Yummy.', 'Now is there really another Modern Vietnamese restaurant in Vancouver that is more happening than here? The answer is NO. There is not. Anh and Chi has done an excellent job creating a bright and fresh and vibrant atmosphere while serving darn good authentic Vietnamese. The food is decorative, and the restaurant has a great vibe. Some of my favorite dishes here: Cay Me - Tofu salad roll is excellent! 
+    ')`)
 }
