@@ -195,6 +195,11 @@ module.exports = async () => {
     VALUES  ('1', 'Josh', '7789195177', '0', '0'),
             ('2', 'James', '6043211123', '0', '0');`)
 
+  await db.query(`INSERT INTO "vehicle" (driver_id, vin, license_plate, make, model, color, year)
+    VALUES  ('1', '123456-0', 'AB1234', 'Toyota', 'Corrola', 'Red', '2007'),
+            ('1', '123456-1', 'AB1235', 'Honda', 'Accord', 'Black', '2009'),
+            ('2', '223456-0', 'CB1235', 'Audi', 'A4', 'White', '2017');`)
+
   await db.query(`INSERT INTO "menu_item" (name, restaurant_id, availability, has_allergens, description, price, type)
     VALUES  ('Fish Filet', 1, true, true, 'Delicious fish filet', 24.54, 'Seafood'),
             ('Fish Sticks', 1, true, true, 'Delicious sticks of fish', 13.21, 'Seafood'),
