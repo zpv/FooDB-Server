@@ -2,7 +2,7 @@ const db = require('./index.js')
 
 module.exports = async () => {
   await db.query(`DROP TABLE IF EXISTS "user", "restaurant", "menu_item", "driver", "drives", \
-  "vehicle", "order", "order_item", "payment_info", "restaurant_review", "driver_review"`)
+  "vehicle", "order", "order_item", "payment_info", "restaurant_review", "driver_review" cascade`)
 
 
   await db.query(`CREATE TABLE "user"
@@ -30,6 +30,7 @@ module.exports = async () => {
       rating DECIMAL(3,2),
       lat	DECIMAL(9,6),
       lon		DECIMAL(9,6),
+      img_url VARCHAR(65535),
     
       PRIMARY KEY (restaurant_id)
     );
@@ -187,9 +188,9 @@ module.exports = async () => {
     );`)
 
 
-  await db.query(`INSERT INTO "restaurant" (restaurant_id, name, address, owner, category, rating, lat, lon)
-    VALUES  ('1',  'Steveston Fisher', '4779 Gothard St','Steven', 'Fast Food', 4.54, 0, 0),
-            ('2', 'Mercante' ,'6388 University Blvd', 'UBCFood', 'Fast Food', 3.10, 0, 0);`)
+  await db.query(`INSERT INTO "restaurant" (restaurant_id, name, address, owner, category, rating, lat, lon, img_url)
+    VALUES  ('1',  'Steveston Fisher', '4779 Gothard St','Steven', 'Fast Food', 4.54, 0, 0, 'https://i.imgur.com/R9655as.png'),
+            ('2', 'Mercante' ,'6388 University Blvd', 'UBCFood', 'Fast Food', 3.10, 0, 0, 'https://i.imgur.com/9EEv4Ne.jpg');`)
 
   await db.query(`INSERT INTO "driver" (driver_id, name, phone_num, lat, lon)
     VALUES  ('1', 'Josh', '7789195177', '0', '0'),
