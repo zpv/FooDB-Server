@@ -191,7 +191,8 @@ module.exports = async () => {
 
   await db.query(`INSERT INTO "restaurant" (restaurant_id, name, address, owner, category, rating, lat, lon, img_url)
     VALUES  ('1',  'Steveston Fisher', '4779 Gothard St','Steven', 'Fast Food', 4.54, 0, 0, 'https://i.imgur.com/R9655as.png'),
-            ('2', 'Mercante' ,'6388 University Blvd', 'UBCFood', 'Fast Food', 3.10, 0, 0, 'https://i.imgur.com/9EEv4Ne.jpg');`)
+            ('2', 'Mercante' ,'6388 University Blvd', 'UBCFood', 'Fast Food', 3.10, 0, 0, 'https://i.imgur.com/9EEv4Ne.jpg'),
+            ('3', 'Ronald McDonald''s Fun House' ,'1234 Main Mall', 'McDees', 'Fast Food', 5, 0, 0, 'https://i.imgur.com/fpWQJKa.png');`)
 
   await db.query(`INSERT INTO "driver" (driver_id, name, phone_num, lat, lon)
     VALUES  ('1', 'Josh', '7789195177', '0', '0'),
@@ -208,13 +209,26 @@ module.exports = async () => {
             ('2', '223456-0', '2016-07-22 19:10:25-07');`)
 
   await db.query(`INSERT INTO "menu_item" (name, restaurant_id, availability, has_allergens, description, price, type)
-    VALUES  ('Fish Filet', 1, true, true, 'Delicious fish filet', 24.54, 'Seafood'),
+    VALUES  ('Fish Filet', 1, true, true, 'Wha she order?', 24.54, 'Seafood'),
             ('Fish Sticks', 1, true, true, 'Delicious sticks of fish', 13.21, 'Seafood'),
             ('Fish Food', 1, true, true, 'Delicious food for fish', 6.56, 'Seafood'),
             ('Salmon Sashimi', 1, true, true, 'Delicious sashimi', 21.50, 'Seafood'),
             ('Crepe', 1, true, true, 'Delicious crepe', 2.54, 'Pastries'),
             ('Fancy Pizza', 2, true, true, 'Overpriced pizza', 12.10, 'Pizza'),
-            ('Fancy Pizza 2', 2, true, true, 'Overpriced pizza 2', 15.60, 'Pizza')`)
+            ('Fancy Pizza 2', 2, true, true, 'Overpriced pizza 2', 15.60, 'Pizza'),
+            ('McDouble', 3, true, true, 'Cheaper version of the double cheeseburger', 6.56, 'Seafood'),
+            ('Cheeseburger', 3, true, true, 'Yum', 21.50, 'Seafood'),
+            ('Big Mac', 3, true, true, 'Bigger than a regular Mac', 2.54, 'Pastries'),
+            ('Double Cheeseburger', 3, true, true, 'Just like a cheeseburger, but double', 12.10, 'Pizza'),
+            ('Filet o'' Fish', 3, true, true, 'Delicious filet o fish with creamy sauce', 6.56, 'Seafood'),
+            ('Chicken Nuggets', 3, true, true, 'Good for snacking on', 21.50, 'Seafood'),
+            ('French Fries', 3, true, true, 'French-style frites', 2.54, 'Pastries'),
+            ('Cocaine', 3, true, true, 'Columbian style cocaine', 12.10, 'Pizza');
+            
+            
+            
+            
+            `)
 
   await db.query(`INSERT INTO "user" (name, email, password) VALUES ('Steven Zhao', 'steven@zhao.io', '$2a$08$undNp20HMxGoZix1k79uMODYeKE7Z7CDkfmkGKe7HfagyRbbryJQq')`)
 
