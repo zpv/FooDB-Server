@@ -35,6 +35,7 @@ router.get('/:id/review', async (req, res) => {
 })
 // TODO: not sure about the actual query part...
 // posts a review for that restaurant
+<<<<<<< HEAD
 // router.post('/:id/review', async (req, res) => {
 //     const { id } = req.params.id
 //     const { restaurant_id } = req.params.body.restaurant_id
@@ -50,6 +51,15 @@ router.post("/", async (req, res) => {
       const {id} = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET)
   
       const { restaurant_id, stars, content} = req.body
+=======
+router.post('/:id/review', async (req, res) => {
+    const { id } = req.params.id
+    const { restaurant_id, user_id } = req.body
+    const { rows } = await db.query('INSERT INTO restaurant_review VALUES (restaurant_review.stars, restaurant_review.content)', [id], [restaurant_id], [user_id]);
+    res.send(rows[0])
+})
+
+>>>>>>> 4d4dd1437eb6c29e2eb6355a2b0362f2e28fd08a
 
       const review_id = (await db.query('INSERT INTO "restaurant_review" (restaurant_id, user_id, restaurant_review.stars, restaurant_review.content) VALUES ($1, $2, $3, $4)', [restaurant_id, id, stars, content])).rows[0].review_id
   
