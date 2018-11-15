@@ -18,7 +18,6 @@ router.get('/list', async (req, res) => {
   res.send(rows)
 })
 
-// register TODO: not right
 router.post('/register', async (req, res) => {
   const { name, email, password, phone } = req.body
   if (email && password && phone) {
