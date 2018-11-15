@@ -35,12 +35,30 @@ router.get('/:id/review', async (req, res) => {
 })
 // TODO: not sure about the actual query part...
 // posts a review for that restaurant
-router.post('/:id/review', async (req, res) => {
-    const { id } = req.params.id
-    const { restaurant_id } = req.params.body.restaurant_id
-    const { user_id } = req.params.body.user_id
-    const { rows } = await db.query('INSERT INTO restaurant_review VALUES (restaurant_review.stars, restaurant_review.content)', [id], [restaurant_id], [user_id]);
-    res.send(rows[0])
-})
+// router.post('/:id/review', async (req, res) => {
+//     const { id } = req.params.id
+//     const { restaurant_id } = req.params.body.restaurant_id
+//     const { user_id } = req.params.body.user_id
+//     const { rows } = await db.query('INSERT INTO restaurant_review (restaurant_review.stars, restaurant_review.content) VALUES ($1, "thi', [id], [restaurant_id], [user_id]);
+//     res.send(rows[0])
+// })
+router.post("/", async (req, res) => {
+    // Verify user is signed in with a proper authentication token
+    const token = req.headers['authorization']
+    if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
+    try {
+      const {id} = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET)
+  
+      const { restaurant_id, stars, content} = req.body
 
-
+      const review_id = (await db.query('INSERT INTO "restaurant_review" (restaurant_id, user_id, restaurant_review.stars, restaurant_review.content) VALUES ($1, $2, $3, $4)', [restaurant_id, id, stars, content])).rows[0].review_id
+  
+      console.log(review_id)
+      res.status(200).send({review_id})
+      const { rows } = await db.query('SELECT name, email, phone_num FROM "user" WHERE user_id = $1', [id])
+      res.send(rows[0])
+    } catch (e) {
+      console.log(e)
+      return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+    }
+  })
