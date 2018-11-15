@@ -101,7 +101,7 @@ module.exports = async () => {
 
   await db.query(`CREATE TABLE "order"
     (
-      order_id          INTEGER NOT NULL,
+      order_id          SERIAL,
       driver_id         INTEGER,
       user_id           INTEGER NOT NULL,
       restaurant_id     INTEGER,
@@ -230,7 +230,7 @@ module.exports = async () => {
             
             `)
 
-  await db.query(`INSERT INTO "user" (name, email, password) VALUES ('Steven Zhao', 'steven@zhao.io', '$2a$08$undNp20HMxGoZix1k79uMODYeKE7Z7CDkfmkGKe7HfagyRbbryJQq')`)
+  await db.query(`INSERT INTO "user" (name, email, password, phone_num, address) VALUES ('Steven Zhao', 'steven@zhao.io', '$2a$08$undNp20HMxGoZix1k79uMODYeKE7Z7CDkfmkGKe7HfagyRbbryJQq', '7787077859', '4779 Gothard St')`)
 
   await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
     VALUES  (1, 1, 3, 'Decent food. Very okay.', 'It is an okay restaurant with okay food. It could have been better. 
