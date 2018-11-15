@@ -16,6 +16,7 @@ router.get('/list', async (req, res) => {
   res.send(rows)
 })
 
+
 router.get('/:id', async (req, res) => {
   const { id } = req.params
   const { rows } = await db.query('SELECT name, phone_num, lat, lon FROM driver WHERE driver_id = $1', [id])
