@@ -2,6 +2,7 @@ const Router = require('express-promise-router')
 
 const db = require('../db')
 const jwt = require('jsonwebtoken')
+const format = require('pg-format')
 
 // create a new express-promise-router
 // this has the same API as the normal express router except
@@ -22,6 +23,14 @@ router.post('/', async (req, res) => {
     const address = (await db.query('SELECT address FROM "user" WHERE user_id = $1', [id])).rows[0].address
 
     const order_id = (await db.query('INSERT INTO "order" (restaurant_id, user_id, address, placed_datetime) VALUES($1, $2, $3, CURRENT_TIMESTAMP) RETURNING order_id', [restaurant_id, id, address])).rows[0].order_id
+
+    let values = []
+    for (item of food_items) {
+      values.push([order_id, restaurant_id, item.name])
+    }
+
+    const insertOrderItems = format('INSERT INTO "order_item" (order_id, restaurant_id, menuitem_name) VALUES %L', values)
+    await db.query(insertOrderItems)
 
     console.log(order_id)
     res.status(200).send({order_id})

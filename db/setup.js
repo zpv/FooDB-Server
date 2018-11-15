@@ -38,7 +38,7 @@ module.exports = async () => {
 
   await db.query(`CREATE TABLE "menu_item"
     (
-      name  VARCHAR(45) NOT NULL,
+      name  VARCHAR(100) NOT NULL,
       restaurant_id INTEGER NOT NULL,
       availability BOOLEAN,
       has_allergens BOOLEAN,
@@ -123,10 +123,10 @@ module.exports = async () => {
 
   await db.query(`CREATE TABLE "order_item"
     (
-      line_number 			INTEGER NOT NULL,
+      line_number 			SERIAL,
       order_id			INTEGER NOT NULL,
       restaurant_id			INTEGER NOT NULL,
-      menuitem_name 		VARCHAR(45),	
+      menuitem_name 		VARCHAR(100),	
       quantity 			INTEGER,
       discount 			INTEGER,
 

@@ -11,7 +11,8 @@
     "express": "^4.16.4",
     "express-promise-router": "^3.0.3",
     "jsonwebtoken": "^8.3.0",
-    "pg": "^7.5.0"
+    "pg": "^7.5.0",
+    "pg-format": "^1.0.4"
   },
   "scripts": {
     "dev": "nodemon server.js",

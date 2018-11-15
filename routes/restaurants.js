@@ -37,8 +37,7 @@ router.get('/:id/review', async (req, res) => {
 // posts a review for that restaurant
 router.post('/:id/review', async (req, res) => {
     const { id } = req.params.id
-    const { restaurant_id } = req.params.body.restaurant_id
-    const { user_id } = req.params.body.user_id
+    const { restaurant_id, user_id } = req.body
     const { rows } = await db.query('INSERT INTO restaurant_review VALUES (restaurant_review.stars, restaurant_review.content)', [id], [restaurant_id], [user_id]);
     res.send(rows[0])
 })
