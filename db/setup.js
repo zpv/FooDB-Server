@@ -58,7 +58,9 @@ module.exports = async () => {
     (
       driver_id INTEGER NOT NULL,
       name      VARCHAR(45),
-      phone_num VARCHAR(45),
+      email     VARCHAR(45) NOT NULL UNIQUE,
+      password  CHAR(60) NOT NULL,
+      phone_num VARCHAR(10) NOT NULL,
       lat DECIMAL(9,6),
       lon DECIMAL(9,6),
 
@@ -194,9 +196,9 @@ module.exports = async () => {
             ('2', 'Mercante' ,'6388 University Blvd', 'UBCFood', 'Fast Food', 3.10, 0, 0, 'https://i.imgur.com/9EEv4Ne.jpg'),
             ('3', 'Ronald McDonald''s Fun House' ,'1234 Main Mall', 'McDees', 'Fast Food', 5, 0, 0, 'https://i.imgur.com/fpWQJKa.png');`)
 
-  await db.query(`INSERT INTO "driver" (driver_id, name, phone_num, lat, lon)
-    VALUES  ('1', 'Josh', '7789195177', '0', '0'),
-            ('2', 'James', '6043211123', '0', '0');`)
+  await db.query(`INSERT INTO "driver" (driver_id, name, email, password, phone_num, lat, lon)
+    VALUES  ('1', 'Josh', 'ericliu7722@gmail.com', 'ILoveDelivery', '7789195177', '0', '0'),
+            ('2', 'James', 'ericliu722@gmail.com', 'MEOW', '6043211123', '0', '0');`)
 
   await db.query(`INSERT INTO "vehicle" (driver_id, vin, license_plate, make, model, color, year)
     VALUES  ('1', '123456-0', 'AB1234', 'Toyota', 'Corrola', 'Red', '2007'),
@@ -224,13 +226,10 @@ module.exports = async () => {
             ('Chicken Nuggets', 3, true, true, 'Good for snacking on', 21.50, 'Seafood'),
             ('French Fries', 3, true, true, 'French-style frites', 2.54, 'Pastries'),
             ('Cocaine', 3, true, true, 'Columbian style cocaine', 12.10, 'Pizza');
-            
-            
-            
-            
             `)
 
-  await db.query(`INSERT INTO "user" (name, email, password, phone_num, address) VALUES ('Steven Zhao', 'steven@zhao.io', '$2a$08$undNp20HMxGoZix1k79uMODYeKE7Z7CDkfmkGKe7HfagyRbbryJQq', '7787077859', '4779 Gothard St')`)
+  await db.query(`INSERT INTO "user" (name, email, password, phone_num, address) 
+    VALUES ('Steven Zhao', 'steven@zhao.io', '$2a$08$undNp20HMxGoZix1k79uMODYeKE7Z7CDkfmkGKe7HfagyRbbryJQq', '7787077859', '4779 Gothard St')`)
 
   await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
     VALUES  (1, 1, 3, 'Decent food. Very okay.', 'It is an okay restaurant with okay food. It could have been better. 
