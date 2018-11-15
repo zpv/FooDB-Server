@@ -58,14 +58,15 @@ router.get('/me', async (req, res) => {
 })
 
 router.get('/:id', async (req, res) => {
-  const review_id = req.params.id
+  const order_id = req.params.id
   const token = req.headers['authorization']
   if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
   try {
     const { id } = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET) // get user id
-    const order = (await db.query('SELECT * FROM "order" WHERE order_id = $1 AND user_id = $2', [review_id, id])).rows[0]
+    const order = (await db.query('SELECT * FROM "order" WHERE order_id = $1 AND user_id = $2', [order_id, id])).rows[0]
+    const order_items = (await db.query('SELECT line_number, menuitem_name, price FROM "order_item", "menu_item" WHERE order_id = $1 AND menu_item.name = menuitem_name', [order_id])).rows
 
-    res.send(order)
+    res.send({order, order_items})
   } catch (e) {
     console.log(e)
     return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
