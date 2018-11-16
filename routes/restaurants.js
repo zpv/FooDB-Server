@@ -31,7 +31,7 @@ router.get('/:id', async (req, res) => {
 // for restaurant managers, gets all orders of the restaurant
 router.get('/:id/orders', async (req, res) => {
     const { id } = req.params
-    const { rows } = await db.query('SELECT * FROM "restaurant", "order" WHERE "restaurant".restaurant_id = "order".restaurant_id AND "order".restaurant_id = $1 AND "order".', [id]);
+    const { rows } = await db.query('SELECT * FROM "restaurant", "order" WHERE "restaurant".restaurant_id = "order".restaurant_id AND "order".restaurant_id = $1 AND prepared_datetime IS NULL', [id]);
     res.send(rows)
 })
 
