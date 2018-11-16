@@ -48,7 +48,7 @@ router.get('/me', async (req, res) => {
   if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
   try {
     const { id } = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET) // get user id
-    const orders = (await db.query('SELECT * FROM "order" WHERE user_id = $1', [id])).rows
+    const orders = (await db.query('SELECT * FROM "order", "restaurant" WHERE user_id = $1 AND "order".restaurant_id = "restaurant".restaurant_id ORDER BY placed_datetime DESC', [id])).rows
 
     res.send(orders)
   } catch (e) {
@@ -63,12 +63,21 @@ router.get('/:id', async (req, res) => {
   if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
   try {
     const { id } = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET) // get user id
-    const order = (await db.query('SELECT * FROM "order" WHERE order_id = $1 AND user_id = $2', [order_id, id])).rows[0]
+    const order = (await db.query('SELECT * FROM "order", "restaurant" WHERE order_id = $1 AND user_id = $2 AND "order".restaurant_id = "restaurant".restaurant_id', [order_id, id])).rows[0]
     const order_items = (await db.query('SELECT line_number, menuitem_name, price FROM "order_item", "menu_item" WHERE order_id = $1 AND menu_item.name = menuitem_name', [order_id])).rows
 
     res.send({order, order_items})
   } catch (e) {
     console.log(e)
     return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+  }
+})
+
+router.post('/:id/status', async (req, res) => {
+  const { id } = req.params
+  const { status } = req.body
+
+  if (status == 'PREPARED') {
+    (await db.query('UPDATE "order" SET prepared_datetime = CURRENT_TIMESTAMP WHERE order_id = $1', [id]))
   }
 })

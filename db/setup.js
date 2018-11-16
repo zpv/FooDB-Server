@@ -109,8 +109,9 @@ module.exports = async () => {
       restaurant_id     INTEGER,
       address           VARCHAR(45),
       placed_datetime   TIMESTAMP,
-      delivered_datetime   TIMESTAMP,
+      prepared_datetime   TIMESTAMP,
       received_datetime   TIMESTAMP,
+      delivered_datetime   TIMESTAMP,
       special_instructions VARCHAR(300),
 
       PRIMARY KEY (order_id),
