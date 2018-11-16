@@ -31,14 +31,14 @@ router.get('/:id', async (req, res) => {
 // for restaurant managers, gets all orders of the restaurant
 router.get('/:id/orders', async (req, res) => {
     const { id } = req.params
-    const { rows } = await db.query('SELECT * FROM "restaurant", "order" WHERE "restaurant".restaurant_id = "order".restaurant_id AND "order".restaurant_id = $1', [id]);
+    const { rows } = await db.query('SELECT * FROM "restaurant", "order" WHERE "restaurant".restaurant_id = "order".restaurant_id AND "order".restaurant_id = $1 AND "order".', [id]);
     res.send(rows)
 })
 
 // gets all reviews for that restaurant
 router.get('/:id/review', async (req, res) => {
     const { id } = req.params.id
-    const { rows } = await db.query('S  ELECT * FROM restaurant_review, restaurant WHERE restaurant_review.restaurant_id = rest.restaurant_id', [id]);
+    const { rows } = await db.query('SELECT * FROM restaurant_review, restaurant WHERE restaurant_review.restaurant_id = rest.restaurant_id', [id]);
     res.send(rows)
 })
 // TODO: not sure about the actual query part...
