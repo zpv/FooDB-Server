@@ -31,14 +31,14 @@ router.get('/:id', async (req, res) => {
 // for restaurant managers, gets all orders of the restaurant
 router.get('/:id/orders', async (req, res) => {
     const { id } = req.params
-    const { rows } = await db.query('SELECT * FROM "restaurant", "order" WHERE "restaurant".restaurant_id = "order".restaurant_id AND "order".restaurant_id = $1', [id]);
+    const { rows } = await db.query('SELECT * FROM "restaurant", "order" WHERE "restaurant".restaurant_id = "order".restaurant_id AND "order".restaurant_id = $1 AND "order".', [id]);
     res.send(rows)
 })
 
 // gets all reviews for that restaurant
 router.get('/:id/review', async (req, res) => {
     const { id } = req.params.id
-    const { rows } = await db.query('S  ELECT * FROM restaurant_review, restaurant WHERE restaurant_review.restaurant_id = rest.restaurant_id', [id]);
+    const { rows } = await db.query('SELECT * FROM restaurant_review, restaurant WHERE restaurant_review.restaurant_id = rest.restaurant_id', [id]);
     res.send(rows)
 })
 
@@ -49,6 +49,7 @@ router.get('/:id', async (req, res) => {
 })
 // TODO: not sure about the actual query part...
 // posts a review for that restaurant
+<<<<<<< HEAD
 <<<<<<< HEAD
 // router.post('/:id/review', async (req, res) => {
 //     const { id } = req.params.id
@@ -81,12 +82,15 @@ router.post("/", async (req, res) => {
 =======
 >>>>>>> 92dcb275c7965830844cb8b68c9ec12e3cc89b91
 =======
+=======
+>>>>>>> 836682468f22ad0fed6f65feca299d9f64b1a4b5
 router.post('/:id/review', async (req, res) => {
     const { id } = req.params.id
     const { restaurant_id, user_id } = req.body
     const { rows } = await db.query('INSERT INTO restaurant_review VALUES (restaurant_review.stars, restaurant_review.content)', [id], [restaurant_id], [user_id]);
     res.send(rows[0])
 })
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 8a017fd9ff72aef53aec219480e42f20ff9222a0
 =======
@@ -108,3 +112,5 @@ router.post('/:id/review', async (req, res) => {
   })
 >>>>>>> 5f32dfff06617ef525eb6087a293db045496bd1e
 >>>>>>> 92dcb275c7965830844cb8b68c9ec12e3cc89b91
+=======
+>>>>>>> 836682468f22ad0fed6f65feca299d9f64b1a4b5
