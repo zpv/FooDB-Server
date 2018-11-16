@@ -20,6 +20,9 @@ module.exports = async () => {
     );
   `)
 
+  await db.query(`CREATE VIEW "user_info"(user_id, address, name, email, phone_num) AS
+    SELECT user_id, address, name, email, phone_num FROM "user";`)
+
   await db.query(`CREATE TABLE "restaurant"
     (
       restaurant_id	INTEGER NOT NULL,
@@ -31,7 +34,7 @@ module.exports = async () => {
       lat	DECIMAL(9,6),
       lon		DECIMAL(9,6),
       img_url VARCHAR(65535),
-    
+
       PRIMARY KEY (restaurant_id)
     );
   `)
@@ -192,6 +195,9 @@ module.exports = async () => {
     );`)
 
 
+
+
+
   await db.query(`INSERT INTO "restaurant" (restaurant_id, name, address, owner, category, rating, lat, lon, img_url)
     VALUES  ('1',  'Steveston Fisher', '4779 Gothard St','Steven', 'Fast Food', 4.54, 0, 0, 'https://i.imgur.com/R9655as.png'),
             ('2', 'Mercante' ,'6388 University Blvd', 'UBCFood', 'Fast Food', 3.10, 0, 0, 'https://i.imgur.com/9EEv4Ne.jpg'),
@@ -226,7 +232,7 @@ module.exports = async () => {
             ('Filet o'' Fish', 3, true, true, 'Delicious filet o fish with creamy sauce', 6.56, 'Seafood'),
             ('Chicken Nuggets', 3, true, true, 'Good for snacking on', 21.50, 'Seafood'),
             ('French Fries', 3, true, true, 'French-style frites', 2.54, 'Pastries'),
-            ('Cocaine', 3, true, true, 'Columbian style cocaine', 12.10, 'Pizza');
+            ('"Coke"', 3, true, true, 'Columbian style "coke"', 12.10, 'Pizza');
             `)
 
   await db.query(`INSERT INTO "user" (name, email, password, phone_num, address) 

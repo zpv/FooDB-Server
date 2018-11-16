@@ -19,7 +19,9 @@ router.get('/', async (req, res) => {
   
   try {
     const {id} = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET)
-    const { rows } = await db.query('SELECT name, email, phone_num FROM "user" WHERE user_id = $1', [id])
+
+    // user_info is a View of user which hides passwords – prevent access of unnecessary information.
+    const { rows } = await db.query('SELECT * FROM "user_info" WHERE user_id = $1', [id])
     res.send(rows[0])
   } catch (e) {
     console.log(e)
