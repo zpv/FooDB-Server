@@ -41,11 +41,76 @@ router.get('/:id/review', async (req, res) => {
     const { rows } = await db.query('SELECT * FROM restaurant_review, restaurant WHERE restaurant_review.restaurant_id = rest.restaurant_id', [id]);
     res.send(rows)
 })
+
+router.get('/:id', async (req, res) => {
+    const { id } = req.params.id
+    const { rows } = await db.query('SELECT COUNT(*), category FROM restaurant WHERE category = $1 GROUP BY category', [id]);
+    res.send(rows)
+})
 // TODO: not sure about the actual query part...
 // posts a review for that restaurant
+<<<<<<< HEAD
+<<<<<<< HEAD
+// router.post('/:id/review', async (req, res) => {
+//     const { id } = req.params.id
+//     const { restaurant_id } = req.params.body.restaurant_id
+//     const { user_id } = req.params.body.user_id
+//     const { rows } = await db.query('INSERT INTO restaurant_review (restaurant_review.stars, restaurant_review.content) VALUES ($1, "thi', [id], [restaurant_id], [user_id]);
+//     res.send(rows[0])
+// })
+router.post("/", async (req, res) => {
+    // Verify user is signed in with a proper authentication token
+    const token = req.headers['authorization']
+    if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
+    try {
+      const {id} = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET)
+  
+      const { restaurant_id, stars, content} = req.body
+<<<<<<< HEAD
+
+      const review_id = (await db.query('INSERT INTO "restaurant_review" (restaurant_id, user_id, restaurant_review.stars, restaurant_review.content) VALUES ($1, $2, $3, $4)', [restaurant_id, id, stars, content])).rows[0].review_id
+  
+      console.log(review_id)
+      res.status(200).send({review_id})
+      const { rows } = await db.query('SELECT name, email, phone_num FROM "user" WHERE user_id = $1', [id])
+      res.send(rows[0])
+    } catch (e) {
+      console.log(e)
+      return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+    }
+  })
+=======
+>>>>>>> 92dcb275c7965830844cb8b68c9ec12e3cc89b91
+=======
+=======
+>>>>>>> 836682468f22ad0fed6f65feca299d9f64b1a4b5
 router.post('/:id/review', async (req, res) => {
     const { id } = req.params.id
     const { restaurant_id, user_id } = req.body
     const { rows } = await db.query('INSERT INTO restaurant_review VALUES (restaurant_review.stars, restaurant_review.content)', [id], [restaurant_id], [user_id]);
     res.send(rows[0])
 })
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 8a017fd9ff72aef53aec219480e42f20ff9222a0
+=======
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4d4dd1437eb6c29e2eb6355a2b0362f2e28fd08a
+
+      const review_id = (await db.query('INSERT INTO "restaurant_review" (restaurant_id, user_id, restaurant_review.stars, restaurant_review.content) VALUES ($1, $2, $3, $4)', [restaurant_id, id, stars, content])).rows[0].review_id
+  
+      console.log(review_id)
+      res.status(200).send({review_id})
+      const { rows } = await db.query('SELECT name, email, phone_num FROM "user" WHERE user_id = $1', [id])
+      res.send(rows[0])
+    } catch (e) {
+      console.log(e)
+      return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+    }
+  })
+>>>>>>> 5f32dfff06617ef525eb6087a293db045496bd1e
+>>>>>>> 92dcb275c7965830844cb8b68c9ec12e3cc89b91
+=======
+>>>>>>> 836682468f22ad0fed6f65feca299d9f64b1a4b5
