@@ -18,6 +18,13 @@ router.get('/list', async (req, res) => {
   res.send(rows)
 })
 
+// Get assigned orders for driver
+router.get('/:id/orders', async (req, res) => {
+  const { id } = req.params
+  const { rows } = await db.query('SELECT "restaurant".address as r_address, * FROM "restaurant", "order" WHERE "restaurant".restaurant_id = "order".restaurant_id AND driver_id = $1', [id]);
+  res.send(rows)
+})
+
 // register TODO: not right
 router.post('/register', async (req, res) => {
   const { name, email, password, phone } = req.body

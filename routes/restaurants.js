@@ -27,7 +27,6 @@ router.get('/:id', async (req, res) => {
     res.send(rows[0])
 })
 
-
 // for restaurant managers, gets all orders of the restaurant
 router.get('/:id/orders', async (req, res) => {
     const { id } = req.params

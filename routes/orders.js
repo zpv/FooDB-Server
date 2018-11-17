@@ -96,8 +96,15 @@ router.post('/:id/status', async (req, res) => {
   const { status } = req.body
 
   if (status == 'PREPARED') {
-    (await db.query('UPDATE "order" SET prepared_datetime = CURRENT_TIMESTAMP WHERE order_id = $1', [id]))
-    // Assign order to random driver.
-    
+    // Update order status and Assign order to random driver.
+    const { driver_id }  = (await db.query('SELECT driver_id FROM driver ORDER BY RANDOM() LIMIT 1')).rows[0]
+    await db.query('UPDATE "order" SET prepared_datetime = CURRENT_TIMESTAMP, driver_id = $2 WHERE order_id = $1', [id, driver_id])
+  } else if (status == 'RECEIVED') {
+    await db.query('UPDATE "order" SET received_datetime = CURRENT_TIMESTAMP WHERE order_id = $1', [id])
+  } else if (status == 'DELIVERED') {
+    await db.query('UPDATE "order" SET delivered_datetime = CURRENT_TIMESTAMP WHERE order_id = $1', [id])
+  } else {
+    return res.status(400).send('Invalid status')
   }
+  return res.status(200).send()
 })
