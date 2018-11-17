@@ -199,9 +199,9 @@ module.exports = async () => {
 
 
   await db.query(`INSERT INTO "restaurant" (restaurant_id, name, address, owner, category, rating, lat, lon, img_url)
-    VALUES  ('1',  'Steveston Fisher', '4779 Gothard St','Steven', 'Fast Food', 4.54, 0, 0, 'https://i.imgur.com/R9655as.png'),
-            ('2', 'Mercante' ,'6388 University Blvd', 'UBCFood', 'Fast Food', 3.10, 0, 0, 'https://i.imgur.com/9EEv4Ne.jpg'),
-            ('3', 'Ronald McDonald''s Fun House' ,'1234 Main Mall', 'McDees', 'Fast Food', 5, 0, 0, 'https://i.imgur.com/fpWQJKa.png');`)
+    VALUES  ('1',  'Steveston Fisher', '3 Avenue, Richmond BC','Steven', 'Fast Food', 4.54, 49.124148, -123.186580, 'https://i.imgur.com/R9655as.png'),
+            ('2', 'Mercante' ,'6388 University Blvd, Vancouver', 'UBCFood', 'Fast Food', 3.10, 49.263700, -123.255000, 'https://i.imgur.com/9EEv4Ne.jpg'),
+            ('3', 'Ronald McDonald''s Fun House' ,'3308 W Broadway, Vancouver', 'McDees', 'Fast Food', 5, 49.264104, -123.178065, 'https://i.imgur.com/fpWQJKa.png');`)
 
   await db.query(`INSERT INTO "driver" (driver_id, name, email, password, phone_num, lat, lon)
     VALUES  ('1', 'Josh', 'ericliu7722@gmail.com', 'ILoveDelivery', '7789195177', '0', '0'),

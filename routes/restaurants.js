@@ -23,7 +23,7 @@ router.get('/list', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
     const { id } = req.params
-    const { rows } = await db.query('SELECT name, rating FROM restaurant WHERE restaurant_id = $1', [id])
+    const { rows } = await db.query('SELECT * FROM restaurant WHERE restaurant_id = $1', [id])
     res.send(rows[0])
 })
 
@@ -36,9 +36,9 @@ router.get('/:id/orders', async (req, res) => {
 })
 
 // gets all reviews for that restaurant
-router.get('/:id/review', async (req, res) => {
-    const { id } = req.params.id
-    const { rows } = await db.query('SELECT * FROM restaurant_review, restaurant WHERE restaurant_review.restaurant_id = rest.restaurant_id', [id]);
+router.get('/:id/reviews', async (req, res) => {
+    const { id } = req.params
+    const { rows } = await db.query('SELECT * FROM restaurant_review WHERE restaurant_review.restaurant_id = $1', [id]);
     res.send(rows)
 })
 

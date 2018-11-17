@@ -48,7 +48,16 @@ router.get('/me', async (req, res) => {
   if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
   try {
     const { id } = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET) // get user id
-    const orders = (await db.query('SELECT * FROM "order", "restaurant" WHERE user_id = $1 AND "order".restaurant_id = "restaurant".restaurant_id ORDER BY placed_datetime DESC', [id])).rows
+    const orders = (await db.query(`
+    SELECT * FROM "order", "restaurant", (SELECT sum(menu_item.price) AS subtotal, order_item.order_id
+                                              FROM order_item, menu_item
+                                              WHERE order_item.menuitem_name = menu_item.name AND
+                                                    order_item.restaurant_id = menu_item.restaurant_id
+                                              GROUP BY order_item.order_id) AS sum
+      WHERE user_id = $1 AND
+            "order".restaurant_id = "restaurant".restaurant_id AND
+            sum.order_id = "order".order_id
+      ORDER BY placed_datetime DESC`, [id])).rows
 
     res.send(orders)
   } catch (e) {
@@ -64,9 +73,18 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET) // get user id
     const order = (await db.query('SELECT * FROM "order", "restaurant" WHERE order_id = $1 AND user_id = $2 AND "order".restaurant_id = "restaurant".restaurant_id', [order_id, id])).rows[0]
+    // AGGREGATION - SUM THE TOTAL OF THE PRICE'S OF THE ORDER
+
+    const subtotal = parseFloat((await db.query(`SELECT sum(menu_item.price)
+    FROM order_item, menu_item
+    WHERE order_item.menuitem_name = menu_item.name AND
+          order_item.restaurant_id = menu_item.restaurant_id
+    GROUP BY order_item.order_id
+    HAVING order_item.order_id = $1`, [order_id])).rows[0].sum);
+    
     const order_items = (await db.query('SELECT line_number, menuitem_name, price FROM "order_item", "menu_item" WHERE order_id = $1 AND menu_item.name = menuitem_name', [order_id])).rows
 
-    res.send({order, order_items})
+    res.send({order, order_items, subtotal})
   } catch (e) {
     console.log(e)
     return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
@@ -79,5 +97,7 @@ router.post('/:id/status', async (req, res) => {
 
   if (status == 'PREPARED') {
     (await db.query('UPDATE "order" SET prepared_datetime = CURRENT_TIMESTAMP WHERE order_id = $1', [id]))
+    // Assign order to random driver.
+    
   }
 })
