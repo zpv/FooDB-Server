@@ -51,30 +51,25 @@ router.get('/:id', async (req, res) => {
 
 router.get('/:id/division', async (req, res) => {
     const { id } = req.params
-    await db.query(format(`
-    CREATE OR REPLACE VIEW foods_ordered AS
-        (SELECT name from
-        order_item o2, menu_item m2
-    WHERE m2.restaurant_id = o2.restaurant_id
-        AND m2.name = o2.menuitem_name
-        AND o2.restaurant_id = %L)`, id))
-        
 
     const division = await db.query(`
-
-    SELECT name FROM foods_ordered
-
-    EXCEPT 
-
-    SELECT name FROM /* Gets all the unique food items which were not included in every order */ 
-    (
-    (SELECT order_id, name FROM "order" o, foods_ordered
-        WHERE o.restaurant_id = $1) /* get cross product of food items and order_item (all possible combinations of food_item and order) */
+    (SELECT name
+      FROM menu_item m
+      WHERE m.restaurant_id = $1)
+    EXCEPT
+    (SELECT name
+      FROM (
+        (SELECT order_id, name
+          FROM menu_item m2, "order" o2
+          WHERE m2.restaurant_id = $1
+            AND o2.restaurant_id = m2.restaurant_id)
         EXCEPT
-        (SELECT order_id, name FROM menu_item m1, order_item o1
-            WHERE m1.name = o1.menuitem_name AND m1.restaurant_id = $1)) /* get actual food items in each order*/
-    AS bad_foods;
-    `, [id])
+          (SELECT order_id, name
+          FROM menu_item m3, order_item oi1
+          WHERE m3.restaurant_id = $1
+            AND oi1.restaurant_id = m3.restaurant_id
+            AND oi1.menuitem_name = m3.name))
+      AS bad)`, [id])
 
     console.log(division.rows)
     res.send(division.rows)
