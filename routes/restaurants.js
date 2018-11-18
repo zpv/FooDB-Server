@@ -1,5 +1,5 @@
 const Router = require('express-promise-router')
-
+var format = require('pg-format');
 const db = require('../db')
 
 // create a new express-promise-router
@@ -23,24 +23,91 @@ router.get('/list', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
     const { id } = req.params
-    const { rows } = await db.query('SELECT name, rating FROM restaurant WHERE restaurant_id = $1', [id])
+    const { rows } = await db.query('SELECT * FROM restaurant WHERE restaurant_id = $1', [id])
     res.send(rows[0])
+})
+
+// for restaurant managers, gets all orders of the restaurant
+router.get('/:id/orders', async (req, res) => {
+    const { id } = req.params
+    const { rows } = await db.query('SELECT * FROM "restaurant", "order" WHERE "restaurant".restaurant_id = "order".restaurant_id AND "order".restaurant_id = $1 AND prepared_datetime IS NULL', [id]);
+    res.send(rows)
 })
 
 // gets all reviews for that restaurant
-router.get('/:id/review', async (req, res) => {
-    const { id } = req.params.id
-    const { rows } = await db.query('SELECT * FROM restaurant_review, restaurant WHERE restaurant_review.restaurant_id = rest.restaurant_id', [id]);
+router.get('/:id/reviews', async (req, res) => {
+    const { id } = req.params
+    const { rows } = await db.query('SELECT * FROM restaurant_review WHERE restaurant_review.restaurant_id = $1', [id]);
     res.send(rows)
 })
-// TODO: not sure about the actual query part...
-// posts a review for that restaurant
-router.post('/:id/review', async (req, res) => {
+
+router.get('/:id', async (req, res) => {
     const { id } = req.params.id
-    const { restaurant_id } = req.params.body.restaurant_id
-    const { user_id } = req.params.body.user_id
-    const { rows } = await db.query('INSERT INTO restaurant_review VALUES (restaurant_review.stars, restaurant_review.content)', [id], [restaurant_id], [user_id]);
-    res.send(rows[0])
+    const { rows } = await db.query('SELECT COUNT(*), category FROM restaurant WHERE category = $1 GROUP BY category', [id]);
+    res.send(rows)
 })
 
+/* GET FOOD ITEMS WHICH WERE INCLUDED IN ALL ORDERS OF THE RESTAURANT */
 
+router.get('/:id/division', async (req, res) => {
+    const { id } = req.params
+
+    const division = await db.query(`
+    (SELECT name
+      FROM menu_item m
+      WHERE m.restaurant_id = $1)
+    EXCEPT
+    (SELECT name
+      FROM (
+        (SELECT order_id, name
+          FROM menu_item m2, "order" o2
+          WHERE m2.restaurant_id = $1
+            AND o2.restaurant_id = m2.restaurant_id)
+        EXCEPT
+          (SELECT order_id, name
+          FROM menu_item m3, order_item oi1
+          WHERE m3.restaurant_id = $1
+            AND oi1.restaurant_id = m3.restaurant_id
+            AND oi1.menuitem_name = m3.name))
+      AS bad)`, [id])
+
+      res.send(division.rows)
+})
+
+router.post("/", async (req, res) => {
+    // Verify user is signed in with a proper authentication token
+    const token = req.headers['authorization']
+    if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
+    try {
+      const {id} = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET)
+  
+      const { restaurant_id, stars, content} = req.body
+
+      const review_id = (await db.query('INSERT INTO "restaurant_review" (restaurant_id, user_id, restaurant_review.stars, restaurant_review.content) VALUES ($1, $2, $3, $4)', [restaurant_id, id, stars, content])).rows[0].review_id
+  
+      console.log(review_id)
+      res.status(200).send({review_id})
+      const { rows } = await db.query('SELECT name, email, phone_num FROM "user" WHERE user_id = $1', [id])
+      res.send(rows[0])
+    } catch (e) {
+      console.log(e)
+      return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+    }
+  })
+
+// router.post('/:id/review', async (req, res) => {
+//     const { id } = req.params
+//     const { restaurant_id, user_id } = req.body
+//     const { rows } = await db.query('INSERT INTO restaurant_review VALUES (restaurant_review.stars, restaurant_review.content)', [id], [restaurant_id], [user_id]);
+//     res.send(rows[0])
+//       const review_id = (await db.query('INSERT INTO "restaurant_review" (restaurant_id, user_id, restaurant_review.stars, restaurant_review.content) VALUES ($1, $2, $3, $4)', [restaurant_id, id, stars, content])).rows[0].review_id
+  
+//       console.log(review_id)
+//       res.status(200).send({review_id})
+//       const { rows } = await db.query('SELECT name, email, phone_num FROM "user" WHERE user_id = $1', [id])
+//       res.send(rows[0])
+//     } catch (e) {
+//       console.log(e)
+//       return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+//     }
+//   )

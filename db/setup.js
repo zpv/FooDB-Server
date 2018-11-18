@@ -20,6 +20,10 @@ module.exports = async () => {
     );
   `)
 
+  // Don't send password hashes!
+  await db.query(`CREATE VIEW "user_info"(user_id, address, name, email, phone_num) AS
+    SELECT user_id, address, name, email, phone_num FROM "user";`)
+
   await db.query(`CREATE TABLE "restaurant"
     (
       restaurant_id	SERIAL,
@@ -31,14 +35,14 @@ module.exports = async () => {
       lat	DECIMAL(9,6),
       lon		DECIMAL(9,6),
       img_url VARCHAR(65535),
-    
+
       PRIMARY KEY (restaurant_id)
     );
   `)
 
   await db.query(`CREATE TABLE "menu_item"
     (
-      name  VARCHAR(45) NOT NULL,
+      name  VARCHAR(100) NOT NULL,
       restaurant_id INTEGER NOT NULL,
       availability BOOLEAN,
       has_allergens BOOLEAN,
@@ -109,8 +113,9 @@ module.exports = async () => {
       restaurant_id     INTEGER,
       address           VARCHAR(45),
       placed_datetime   TIMESTAMP,
-      delivered_datetime   TIMESTAMP,
+      prepared_datetime   TIMESTAMP,
       received_datetime   TIMESTAMP,
+      delivered_datetime   TIMESTAMP,
       special_instructions VARCHAR(300),
 
       PRIMARY KEY (order_id),
@@ -125,10 +130,10 @@ module.exports = async () => {
 
   await db.query(`CREATE TABLE "order_item"
     (
-      line_number 			INTEGER NOT NULL,
+      line_number 			SERIAL,
       order_id			INTEGER NOT NULL,
       restaurant_id			INTEGER NOT NULL,
-      menuitem_name 		VARCHAR(45),	
+      menuitem_name 		VARCHAR(100),	
       quantity 			INTEGER,
       discount 			INTEGER,
 
@@ -191,10 +196,13 @@ module.exports = async () => {
     );`)
 
 
+
+
+
   await db.query(`INSERT INTO "restaurant" (restaurant_id, name, address, owner, category, rating, lat, lon, img_url)
-    VALUES  ('1',  'Steveston Fisher', '4779 Gothard St','Steven', 'Fast Food', 4.54, 0, 0, 'https://i.imgur.com/R9655as.png'),
-            ('2', 'Mercante' ,'6388 University Blvd', 'UBCFood', 'Fast Food', 3.10, 0, 0, 'https://i.imgur.com/9EEv4Ne.jpg'),
-            ('3', 'Ronald McDonald''s Fun House' ,'1234 Main Mall', 'McDees', 'Fast Food', 5, 0, 0, 'https://i.imgur.com/fpWQJKa.png');`)
+    VALUES  ('1',  'Steveston Fisher', '3 Avenue, Richmond BC','Steven', 'Fast Food', 4.54, 49.124148, -123.186580, 'https://i.imgur.com/R9655as.png'),
+            ('2', 'Mercante' ,'6388 University Blvd, Vancouver', 'UBCFood', 'Fast Food', 3.10, 49.263700, -123.255000, 'https://i.imgur.com/9EEv4Ne.jpg'),
+            ('3', 'Ronald McDonald''s Fun House' ,'3308 W Broadway, Vancouver', 'McDees', 'Fast Food', 5, 49.264104, -123.178065, 'https://i.imgur.com/fpWQJKa.png');`)
 
   await db.query(`INSERT INTO "driver" (driver_id, name, email, password, phone_num, lat, lon)
     VALUES  ('1', 'Josh', 'ericliu7722@gmail.com', 'ILoveDelivery', '7789195177', '0', '0'),
@@ -225,7 +233,7 @@ module.exports = async () => {
             ('Filet o'' Fish', 3, true, true, 'Delicious filet o fish with creamy sauce', 6.56, 'Seafood'),
             ('Chicken Nuggets', 3, true, true, 'Good for snacking on', 21.50, 'Seafood'),
             ('French Fries', 3, true, true, 'French-style frites', 2.54, 'Pastries'),
-            ('Cocaine', 3, true, true, 'Columbian style cocaine', 12.10, 'Pizza');
+            ('"Coke"', 3, true, true, 'Columbian style "coke"', 12.10, 'Pizza');
             `)
 
   await db.query(`INSERT INTO "user" (name, email, password, phone_num, address) 
