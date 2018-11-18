@@ -85,6 +85,13 @@ router.get('/:id', async (req, res) => {
   res.send(rows[0])
 })
 
+// Not returning response for some reason??
+router.delete('/delete', async (req, res) => {
+  const { id } = req.body
+  const { rows } = await db.query('DELETE FROM driver WHERE driver_id = $1', [id])
+  res.send(rows);
+})
+
 router.get('/:id/vehicles', async (req, res) => {
   const { id } = req.params
   const { rows } = await db.query('SELECT name, phone_num, license_plate, make, model, color, year, since' +
