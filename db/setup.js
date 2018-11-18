@@ -4,7 +4,6 @@ module.exports = async () => {
   await db.query(`DROP TABLE IF EXISTS "user", "restaurant", "menu_item", "driver", "drives", \
   "vehicle", "order", "order_item", "payment_info", "restaurant_review", "driver_review" cascade`)
 
-
   await db.query(`CREATE TABLE "user"
     (
       user_id	SERIAL,
