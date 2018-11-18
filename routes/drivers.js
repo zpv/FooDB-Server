@@ -62,22 +62,20 @@ router.post('/login', async (req, res) => {
 })
 
 //
-router.post('/:id/update/phone', async (req, res) => {
-  const id = req.params
+router.post('/update/phone', async (req, res) => {
   const token = req.headers['authorization']
-  const email = req.body
+  const phone = req.body
   if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
   if (phone) {
     try {
       const { id } = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET) // get driver id
-      const { rows } = await db.query('UPDATE driver SET phone_num = $1 WHERE driver_id = $2', [email, id])
+      const { rows } = await db.query('UPDATE driver SET phone_num = $1 WHERE driver_id = $2', [phone, id])
       res.send(rows[0])
     } catch (e) {
       console.log(e)
       res.status(500).send({auth: false, error: 'Failed to authenticate token.'})
     }
   }
-
 })
 
 // Endpoint for getting deliverer info
