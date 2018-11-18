@@ -52,6 +52,11 @@ router.post('/register', async (req, res) => {
   }
 })
 
+router.get('/:id/rest-reviews', async (req, res) => {
+  const { id } = req.params
+  const rows = (await db.query('SELECT * FROM restaurant_review WHERE restaurant_review.user_id = $1', [id])).rows;
+  res.send(rows)
+})
 
 router.post('/login', async (req, res) => {
   const { email, password } = req.body 

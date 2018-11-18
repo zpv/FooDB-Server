@@ -203,9 +203,9 @@ module.exports = async () => {
             ('2', 'Mercante' ,'6388 University Blvd, Vancouver', 'UBCFood', 'Fast Food', 3.10, 49.263700, -123.255000, 'https://i.imgur.com/9EEv4Ne.jpg'),
             ('3', 'Ronald McDonald''s Fun House' ,'3308 W Broadway, Vancouver', 'McDees', 'Fast Food', 5, 49.264104, -123.178065, 'https://i.imgur.com/fpWQJKa.png');`)
 
-  await db.query(`INSERT INTO "driver" (driver_id, name, email, password, phone_num, lat, lon)
-    VALUES  ('1', 'Josh', 'ericliu7722@gmail.com', 'ILoveDelivery', '7789195177', '0', '0'),
-            ('2', 'James', 'ericliu722@gmail.com', 'MEOW', '6043211123', '0', '0');`)
+  await db.query(`INSERT INTO "driver" (name, email, password, phone_num, lat, lon)
+    VALUES  ('Josh', 'ericliu7722@gmail.com', 'ILoveDelivery', '7789195177', '0', '0'),
+            ('James', 'ericliu722@gmail.com', 'MEOW', '6043211123', '0', '0');`)
 
   await db.query(`INSERT INTO "vehicle" (driver_id, vin, license_plate, make, model, color, year)
     VALUES  ('1', '123456-0', 'AB1234', 'Toyota', 'Corrola', 'Red', '2007'),
