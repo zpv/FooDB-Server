@@ -30,8 +30,7 @@ router.post('/register', async (req, res) => {
       const token = jwt.sign({id: driverId}, process.env.SESSION_SECRET, {
         expiresIn: 86400 // expires in 24 hours
       })
-
-      res.status(200).send({auth: true, token: token})
+      res.status(200).send({auth: true, token: token, did: driverId})
     } catch (e) {
       console.log(e)
       if (e.routine == '_bt_check_unique')
@@ -51,10 +50,11 @@ router.post('/login', async (req, res) => {
     }
 
     if(bcrypt.compareSync(password, rows[0].password)) {
+      const driverId = rows[0].driver_id
       let token = jwt.sign({id: rows[0].driver_id}, process.env.SESSION_SECRET, {
         expiresIn: 86400 // expires in 24 hours
       })
-      res.status(200).send({auth: true, token: token})
+      res.status(200).send({auth: true, token: token, did: driverId})
     } else {
       res.status(401).send({ auth: false, token: null })
     }
