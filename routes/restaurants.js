@@ -35,12 +35,16 @@ router.get('/:id/orders', async (req, res) => {
 })
 
 // gets all reviews for that restaurant
-router.get('/:id/reviews', async (req, res) => {
+router.get('/:id/rest-reviews', async (req, res) => {
     const { id } = req.params
     const { rows } = await db.query('SELECT * FROM restaurant_review WHERE restaurant_review.restaurant_id = $1', [id]);
     res.send(rows)
 })
-
+router.get('/:id/user-rest-reviews', async (req, res) => {
+  const { id } = req.params
+  const rows = (await db.query('SELECT * FROM restaurant_review WHERE restaurant_review.user_id = $1', [id])).rows;
+  res.send(rows)
+})
 router.get('/:id', async (req, res) => {
     const { id } = req.params.id
     const { rows } = await db.query('SELECT COUNT(*), category FROM restaurant WHERE category = $1 GROUP BY category', [id]);
