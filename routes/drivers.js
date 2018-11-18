@@ -85,6 +85,45 @@ router.get('/:id', async (req, res) => {
   res.send(rows[0])
 })
 
+router.get('/:id/reviews', async (req, res) => {
+  const { id } = req.params
+  const { rows } = await db.query('SELECT * FROM driver_review WHERE driver_id = $1', [id]);
+  res.send(rows)
+})
+
+router.get('/:id/stars', async (req, res) => {
+  const { id } = req.params
+  const { rows } = await db.query('SELECT avg(stars) FROM driver_review WHERE driver_id = $1', [id]);
+  res.send(rows)
+})
+
+router.delete('/delete', async (req, res) => {
+  const { id } = req.body
+  const { rows } = await db.query('DELETE FROM driver WHERE driver_id = $1', [id])
+  res.send(rows);
+})
+
+router.post("/", async (req, res) => {
+  // Verify user is signed in with a proper authentication token
+  const token = req.headers['authorization']
+  if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
+  try {
+    const {id} = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET)
+
+    const { driver_id, stars} = req.body
+
+    const review_id = (await db.query('INSERT INTO "restaurant_review" (driver_id, user_id, stars) VALUES ($1, $2, $3)', [driver_id, id, stars])).rows[0].review_id
+
+    console.log(review_id)
+    res.status(200).send({review_id})
+    const { rows } = await db.query('SELECT name, email, phone_num FROM "user" WHERE user_id = $1', [id])
+    res.send(rows[0])
+  } catch (e) {
+    console.log(e)
+    return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+  }
+})
+
 router.get('/:id/vehicles', async (req, res) => {
   const { id } = req.params
   const { rows } = await db.query('SELECT name, phone_num, license_plate, make, model, color, year, since' +
