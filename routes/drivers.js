@@ -24,8 +24,10 @@ router.post('/register', async (req, res) => {
     const hashedPassword = bcrypt.hashSync(password, 8)
 
     try {
+      console.log("faffawf")
       const { rows } = await db.query('INSERT INTO "driver" (name, email, password, phone_num) VALUES($1, $2, $3, $4) RETURNING *', [name, email, hashedPassword, phone])
       const driverId = rows[0].driver_id
+      console.log(driverId)
 
       const token = jwt.sign({id: driverId}, process.env.SESSION_SECRET, {
         expiresIn: 86400 // expires in 24 hours
