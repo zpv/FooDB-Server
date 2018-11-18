@@ -20,6 +20,7 @@ module.exports = async () => {
     );
   `)
 
+  // Don't send password hashes!
   await db.query(`CREATE VIEW "user_info"(user_id, address, name, email, phone_num) AS
     SELECT user_id, address, name, email, phone_num FROM "user";`)
 

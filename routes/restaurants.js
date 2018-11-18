@@ -71,8 +71,7 @@ router.get('/:id/division', async (req, res) => {
             AND oi1.menuitem_name = m3.name))
       AS bad)`, [id])
 
-    console.log(division.rows)
-    res.send(division.rows)
+      res.send(division.rows)
 })
 
 router.post("/", async (req, res) => {
