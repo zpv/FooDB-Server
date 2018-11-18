@@ -18,14 +18,6 @@ router.get('/list', async (req, res) => {
   res.send(rows)
 })
 
-// Get assigned orders for driver
-router.get('/:id/orders', async (req, res) => {
-  const { id } = req.params
-  const { rows } = await db.query('SELECT "restaurant".address as r_address, * FROM "restaurant", "order" WHERE "restaurant".restaurant_id = "order".restaurant_id AND driver_id = $1 AND delivered_datetime IS NULL', [id]);
-  res.send(rows)
-})
-
-// register TODO: not right
 router.post('/register', async (req, res) => {
   const { name, email, password, phone } = req.body
   if (email && password && phone) {
@@ -49,16 +41,40 @@ router.post('/register', async (req, res) => {
   }
 })
 
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body
+  if (email && password) {
+    let { rows } = await db.query('SELECT driver_id, email, password FROM "driver" WHERE email = $1', [email])
+
+    if (!rows[0]) {
+      return res.status(404).send('No user found.')
+    }
+
+    if(bcrypt.compareSync(password, rows[0].password)) {
+      let token = jwt.sign({id: rows[0].driver_id}, process.env.SESSION_SECRET, {
+        expiresIn: 86400 // expires in 24 hours
+      })
+      res.status(200).send({auth: true, token: token})
+    } else {
+      res.status(401).send({ auth: false, token: null })
+    }
+  }
+})
+
 //
 router.post('/:id/update/phone', async (req, res) => {
-  const { id } = req.params
-  const { email } = req.body
-  if (email) {
+  const id = req.params
+  const token = req.headers['authorization']
+  const email = req.body
+  if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
+  if (phone) {
     try {
+      const { id } = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET) // get driver id
       const { rows } = await db.query('UPDATE driver SET phone_num = $1 WHERE driver_id = $2', [email, id])
       res.send(rows[0])
     } catch (e) {
-      res.status(500).send({auth: false, error: 'There was an error updating your phone number.'})
+      console.log(e)
+      res.status(500).send({auth: false, error: 'Failed to authenticate token.'})
     }
   }
 
