@@ -52,21 +52,38 @@ router.post('/register', async (req, res) => {
   }
 })
 
-router.delete('/delete', async (req, res) => {
-  const { name, email, password, phone, address } = req.body
+// router.delete('/delete', async (req, res) => {
+//   const { name, email, password, phone, address } = req.body
+//
+//   try {
+//     const { rows } = await db.query('DELETE FROM "user" WHERE email = $1 AND password = $2', [email, password])
+//     const userId = rows[0].user_id
+//     const token = req.headers['authorization']
+//     res.status(200).send({auth: true, token: token, uid: userId})
+//
+//   } catch (e) {
+//     console.log(e)
+//     // if (!rows[0]) {
+//     //   return res.status(404).send('No user found.')
+//     // }
+//     res.status(500).send({auth: false, error: 'There was an error deleting your account.'})
+//   }
+// })
 
+router.delete("/delete", async (req, res) => {
+  // Verify user is signed in with a proper authentication token
+  const token = req.headers['authorization']
+  if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
   try {
-    const { rows } = await db.query('DELETE FROM "user" WHERE email = $1 AND password = $2', [email, password])
-    const userId = rows[0].user_id
-    const token = req.headers['authorization']
-    res.status(200).send({auth: true, token: token, uid: userId})
+    const {id} = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET)
 
+    const { rows } = await db.query('DELETE FROM user WHERE user_id = $1', [id])
+
+    console.log(rows)
+    res.status(200).send(rows[0])
   } catch (e) {
     console.log(e)
-    // if (!rows[0]) {
-    //   return res.status(404).send('No user found.')
-    // }
-    res.status(500).send({auth: false, error: 'There was an error deleting your account.'})
+    return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
   }
 })
 
