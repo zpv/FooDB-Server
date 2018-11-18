@@ -250,4 +250,10 @@ module.exports = async () => {
     await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
     VALUES  (1, 1, 5, 'Savoury. Yummy.', 'Now is there really another Modern Vietnamese restaurant in Vancouver that is more happening than here? The answer is NO. There is not. Anh and Chi has done an excellent job creating a bright and fresh and vibrant atmosphere while serving darn good authentic Vietnamese. The food is decorative, and the restaurant has a great vibe. Some of my favorite dishes here: Cay Me - Tofu salad roll is excellent! 
     ')`)
+
+  await db.query(`INSERT INTO "driver_review" (driver_id, review_id, user_id, stars, review_datetime)
+    VALUES  ('1', '1', '1', '5', '2016-06-22 19:10:25-07'),
+            ('1', '2', '1', '2', '2016-06-22 18:10:25-07'),
+            ('1', '3', '1', '3', '2016-06-22 17:10:25-07'),
+            ('2', '3', '1', '5', '2018-06-22 17:10:25-07');`)
 }
