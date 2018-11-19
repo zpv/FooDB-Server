@@ -104,13 +104,24 @@ router.get('/:id/orders', async (req, res) => {
   res.send(rows)
 })
 
-router.delete('/delete', async (req, res) => {
-  const { id } = req.body
-  const { rows } = await db.query('DELETE FROM driver WHERE driver_id = $1', [id])
-  res.send(rows);
+router.delete("/delete", async (req, res) => {
+  // Verify user is signed in with a proper authentication token
+  const token = req.headers['authorization']
+  if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
+  try {
+    const {id} = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET)
+
+    const { rows } = await db.query('DELETE FROM driver WHERE driver_id = $1', [id])
+
+    console.log(rows)
+    res.status(200).send(rows[0])
+  } catch (e) {
+    console.log(e)
+    return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+  }
 })
 
-router.post("/", async (req, res) => {
+router.post("/:id/review", async (req, res) => {
   // Verify user is signed in with a proper authentication token
   const token = req.headers['authorization']
   if (!token) return res.status(401).send({auth: false, message: 'No token provided'})

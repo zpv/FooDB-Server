@@ -53,12 +53,16 @@ router.post('/register', async (req, res) => {
 })
 
 router.post('/delete', async (req, res) => {
-  const { email} = req.body
-
+  // const { name, email, password, phone, address } = req.body
+  const token = req.headers['authorization']
+    if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
   try {
-    await db.query('DELETE FROM user WHERE email = $1', [email])
-   // const token = req.headers['authorization']
-    res.status(200).send({auth: true})
+    const {id} = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET)
+
+    const { rows } = await db.query('DELETE FROM "user" WHERE email = $1 AND password = $2 AND user_id = $3', [email, password, id])
+    //const userId = rows[0].user_id
+    
+    res.status(200).send(rows[0])
 
   } catch (e) {
     console.log(e)
