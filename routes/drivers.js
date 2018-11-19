@@ -121,7 +121,7 @@ router.delete("/delete", async (req, res) => {
   }
 })
 
-router.post("/", async (req, res) => {
+router.post("/:id/review", async (req, res) => {
   // Verify user is signed in with a proper authentication token
   const token = req.headers['authorization']
   if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
