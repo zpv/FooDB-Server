@@ -164,6 +164,26 @@ module.exports = async () => {
         ON DELETE CASCADE
     );`)
 
+    // RESTAURANT RATING TRIGGER
+
+    await db.query(`
+    CREATE OR REPLACE FUNCTION update_rating() 
+      RETURNS trigger AS $update_rating$
+      BEGIN
+      UPDATE restaurant
+        SET rating = (SELECT AVG(stars) FROM restaurant_review
+                            WHERE restaurant_review.restaurant_id = restaurant.restaurant_id)
+        WHERE restaurant_id = NEW.restaurant_id;
+        RETURN NEW;
+      END;
+      $update_rating$ LANGUAGE plpgsql;
+    `)
+  
+    await db.query(`CREATE TRIGGER computeRating
+    AFTER INSERT ON restaurant_review
+        FOR EACH ROW
+          EXECUTE FUNCTION update_rating()`)
+
   await db.query(`CREATE TABLE "driver_review"
     (
       driver_id   INTEGER NOT NULL,
