@@ -200,7 +200,7 @@ module.exports = async () => {
         REFERENCES "user"(user_id)
         ON DELETE CASCADE
     );`)
-
+  
 
   await db.query(`INSERT INTO "restaurant" (restaurant_id, name, address, owner, category, rating, lat, lon, img_url)
     VALUES  ('1',  'Steveston Fisher', '3 Avenue, Richmond BC','Steven', 'Fast Food', 4.54, 49.124148, -123.186580, 'https://i.imgur.com/R9655as.png'),
@@ -263,9 +263,63 @@ module.exports = async () => {
     The modern style thin noodles are not my top preference, but it is more popular these days.
     ')`)
 
-    await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
-    VALUES  (1, 1, 5, 'Savoury. Yummy.', 'Now is there really another Modern Vietnamese restaurant in Vancouver that is more happening than here? The answer is NO. There is not. Anh and Chi has done an excellent job creating a bright and fresh and vibrant atmosphere while serving darn good authentic Vietnamese. The food is decorative, and the restaurant has a great vibe. Some of my favorite dishes here: Cay Me - Tofu salad roll is excellent! 
-    ')`)
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+  VALUES  (1, 1, 5, 'Savoury. Yummy.', 'Now is there really another Modern Vietnamese restaurant in Vancouver that is more happening than here? The answer is NO. There is not. Anh and Chi has done an excellent job creating a bright and fresh and vibrant atmosphere while serving darn good authentic Vietnamese. The food is decorative, and the restaurant has a great vibe. Some of my favorite dishes here: Cay Me - Tofu salad roll is excellent! 
+  ')`)
+
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+  VALUES  (2, 1, 2, 
+  'Powerfullly Terrible', 
+  'I love how vigorously the Asian dude cuts apart my pizza. However, the cuts are often uneven, terrible!
+  ')`)
+
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+  VALUES  (2, 1, 3, 
+  'Affordable student option', 
+  'Cheap but not always the best, the quality changes a lot
+  ')`)
+
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+  VALUES  (2, 1, 5, 
+  'Traditional Italian Pizza', 
+  'Simply exquisite, nothing more
+  ')`)
+
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+  VALUES  (3, 1, 5, 
+  'Purest Coke I have every tried', 
+  'The Ronald House Columbian coke puts even Pablo Escobar to shame. Highly recommended
+  ')`)
+
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+  VALUES  (3, 1, 5, 
+  'You will not want any other coke', 
+  'I have only had coke from Ronald House ever since I tried it.
+  ')`)
+
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+  VALUES  (4, 1, 3, 
+  'Better than Jinya', 
+  'At least I did not get food poisoning from Santouka..
+  ')`)
+
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+  VALUES  (4, 1, 5, 
+  'Rich Broth', 
+  'The broth tastes like its been boiled for days. Simply beautiful, highly recommend the shio ramen.
+  ')`)
+
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+  VALUES  (5, 1, 1, 
+  'Their price was too expensive', 
+  'Uni don is way too expensive, so was the unagi done.
+  ')`)
+
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+  VALUES  (6, 1, 4, 
+  'Love their Blue Waffles', 
+  'The blueberry served here is not only beuaitful, but also extremely tasty. The best waffle I ever had.
+  ')`)
 
   await db.query(`INSERT INTO "driver_review" (driver_id, review_id, user_id, stars, review_datetime)
     VALUES  ('1', '1', '1', '5', '2016-06-22 19:10:25-07'),
