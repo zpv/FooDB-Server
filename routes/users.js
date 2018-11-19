@@ -106,6 +106,23 @@ router.post('/delete', async (req, res) => {
   }
 })
 
+// router.post('/update', async (req, res) => {
+//   const { name, email, password, phone, address } = req.body
+//   const hashedPassword = bcrypt.hashSync(password, 8)
+//   try {
+//     const { row } = await db.query('UPDATE user SET name = $1, email = $2, password = $3, phone_num = $4, address = $5',
+//        [name, email, hashedPassword, phone, address])
+//     const token = jwt.sign({id: userId}, process.env.SESSION_SECRET, {
+//       expiresIn: 86400 
+//       })// expires in 24 hours  
+//     res.status(200).send({auth: true, token: token, uid: userId})
+//   } catch(e) {
+//     console.log(e)
+//     res.status(500).send({auth: false, error: 'There was an error updating your account.'})
+
+//   }
+// })
+
 router.get('/:id/rest-reviews', async (req, res) => {
   const { id } = req.params
   const rows = (await db.query('SELECT * FROM restaurant_review WHERE restaurant_review.user_id = $1', [id])).rows;
