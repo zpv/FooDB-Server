@@ -57,6 +57,14 @@ router.post('/login', async (req, res) => {
   }
 })
 
+router.post('/edit', async (req, res) => {
+  const { id, name, email, password, phone } = req.body
+  const hashedPassword = bcrypt.hashSync(password, 8)
+  await db.query('UPDATE "user" SET name = $1, email = $2, password = $3, phone_num = $4 WHERE user_id = $5', [name, email, hashedPassword, phone, id])
+  const { rows } = await db.query('SELECT * FROM driver WHERE driver_id = $1', [id])
+  res.status(200).send(rows[0])
+})
+
 //
 router.post('/update/phone', async (req, res) => {
   const { id, phone} = req.body
