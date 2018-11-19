@@ -200,7 +200,7 @@ module.exports = async () => {
         REFERENCES "user"(user_id)
         ON DELETE CASCADE
     );`)
-  
+
 
   await db.query(`INSERT INTO "restaurant" (restaurant_id, name, address, owner, category, rating, lat, lon, img_url)
     VALUES  ('1',  'Steveston Fisher', '3 Avenue, Richmond BC','Steven', 'Fast Food', 4.54, 49.124148, -123.186580, 'https://i.imgur.com/R9655as.png'),
