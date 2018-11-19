@@ -52,6 +52,77 @@ router.post('/register', async (req, res) => {
   }
 })
 
+router.post('/edit', async (req, res) => {
+  const { name, email, password, phone, address } = req.body 
+
+  const token = req.headers['authorization']
+  if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
+  try {
+    const hashedPassword = bcrypt.hashSync(password, 8)
+
+    const { id } = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET)
+    await db.query('UPDATE "user" SET name = $1, email = $2, password = $3, phone_num = $4, address = $5 WHERE user_id = $6', [name, email, hashedPassword, phone, address, id])
+
+    res.status(200).send()
+    
+  } catch (e) {
+    console.log(e)
+    res.status(500).send({auth: false, error: 'There was an error editing your account.'})
+  }
+})
+
+router.post('/delete', async (req, res) => {
+  const { password } = req.body
+  const token = req.headers['authorization']
+  console.log(req.headers)
+    if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
+  try {
+    const {id} = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET)
+
+    let { rows } = await db.query('SELECT password FROM "user" WHERE user_id = $1', [id])
+ 
+    if (!rows[0]) {
+      return res.status(404).send('No user found.')
+    }
+
+    if(bcrypt.compareSync(password, rows[0].password)) {
+      await db.query('DELETE FROM "user" WHERE user_id = $1', [id])
+      res.status(200).send()
+    } else {
+      res.status(401).send({ auth: false, token: null })
+    }
+
+
+    //const userId = rows[0].user_id
+    
+    res.status(200).send(rows[0])
+
+  } catch (e) {
+    console.log(e)
+    // if (!rows[0]) {
+    //   return res.status(404).send('No user found.')
+    // }
+    res.status(500).send({auth: false, error: 'There was an error deleting your account.'})
+  }
+})
+
+// router.post('/update', async (req, res) => {
+//   const { name, email, password, phone, address } = req.body
+//   const hashedPassword = bcrypt.hashSync(password, 8)
+//   try {
+//     const { row } = await db.query('UPDATE user SET name = $1, email = $2, password = $3, phone_num = $4, address = $5',
+//        [name, email, hashedPassword, phone, address])
+//     const token = jwt.sign({id: userId}, process.env.SESSION_SECRET, {
+//       expiresIn: 86400 
+//       })// expires in 24 hours  
+//     res.status(200).send({auth: true, token: token, uid: userId})
+//   } catch(e) {
+//     console.log(e)
+//     res.status(500).send({auth: false, error: 'There was an error updating your account.'})
+
+//   }
+// })
+
 router.get('/:id/rest-reviews', async (req, res) => {
   const { id } = req.params
   const rows = (await db.query('SELECT * FROM restaurant_review WHERE restaurant_review.user_id = $1', [id])).rows;

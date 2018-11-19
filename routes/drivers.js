@@ -29,10 +29,7 @@ router.post('/register', async (req, res) => {
       const driverId = rows[0].driver_id
       console.log(driverId)
 
-      const token = jwt.sign({id: driverId}, process.env.SESSION_SECRET, {
-        expiresIn: 86400 // expires in 24 hours
-      })
-      res.status(200).send({auth: true, token: token, did: driverId})
+      res.status(200).send({auth: true, did: driverId})
     } catch (e) {
       console.log(e)
       if (e.routine == '_bt_check_unique')
@@ -53,31 +50,26 @@ router.post('/login', async (req, res) => {
 
     if(bcrypt.compareSync(password, rows[0].password)) {
       const driverId = rows[0].driver_id
-      let token = jwt.sign({id: rows[0].driver_id}, process.env.SESSION_SECRET, {
-        expiresIn: 86400 // expires in 24 hours
-      })
-      res.status(200).send({auth: true, token: token, did: driverId})
+      res.status(200).send({auth: true, did: driverId})
     } else {
       res.status(401).send({ auth: false, token: null })
     }
   }
 })
 
+router.post('/edit', async (req, res) => {
+  const { id, name, email, password, phone } = req.body
+  const hashedPassword = bcrypt.hashSync(password, 8)
+  await db.query('UPDATE "user" SET name = $1, email = $2, password = $3, phone_num = $4 WHERE user_id = $5', [name, email, hashedPassword, phone, id])
+  const { rows } = await db.query('SELECT * FROM driver WHERE driver_id = $1', [id])
+  res.status(200).send(rows[0])
+})
+
 //
 router.post('/update/phone', async (req, res) => {
-  const token = req.headers['authorization']
-  const phone = req.body
-  if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
-  if (phone) {
-    try {
-      const { id } = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET) // get driver id
-      const { rows } = await db.query('UPDATE driver SET phone_num = $1 WHERE driver_id = $2', [phone, id])
-      res.send(rows[0])
-    } catch (e) {
-      console.log(e)
-      res.status(500).send({auth: false, error: 'Failed to authenticate token.'})
-    }
-  }
+  const { id, phone} = req.body
+  const { rows } = await db.query('UPDATE driver SET phone_num = $1 WHERE driver_id = $2', [phone, id])
+  res.send(rows[0])
 })
 
 // Endpoint for getting deliverer info
@@ -103,14 +95,19 @@ router.get('/:id/orders', async (req, res) => {
   const { rows } = await db.query('SELECT "restaurant".address as r_address, * FROM "restaurant", "order" WHERE "restaurant".restaurant_id = "order".restaurant_id AND driver_id = $1 AND delivered_datetime IS NULL', [id]);
   res.send(rows)
 })
-
-router.delete('/delete', async (req, res) => {
-  const { id } = req.body
-  const { rows } = await db.query('DELETE FROM driver WHERE driver_id = $1', [id])
-  res.send(rows);
+router.get('/:id/allorders', async (req, res) => {
+  const { id } = req.params
+  const { rows } = await db.query('SELECT "restaurant".address as r_address, * FROM "restaurant", "order" WHERE "restaurant".restaurant_id = "order".restaurant_id AND driver_id = $1', [id]);
+  res.send(rows)
+})
+router.delete("/delete", async (req, res) => {
+  // Verify user is signed in with a proper authentication token
+    const {email} = req.body
+    await db.query('DELETE FROM driver WHERE email = $1', [email])
+    return res.status(200).send({message : "Driver successfully deleted"})
 })
 
-router.post("/", async (req, res) => {
+router.post("/:id/review", async (req, res) => {
   // Verify user is signed in with a proper authentication token
   const token = req.headers['authorization']
   if (!token) return res.status(401).send({auth: false, message: 'No token provided'})

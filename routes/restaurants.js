@@ -1,7 +1,6 @@
 const Router = require('express-promise-router')
 var format = require('pg-format');
 const db = require('../db')
-const jwt = require('jsonwebtoken')
 
 // create a new express-promise-router
 // this has the same API as the normal express router except
@@ -38,7 +37,7 @@ router.get('/:id/orders', async (req, res) => {
 // gets all reviews for that restaurant
 router.get('/:id/rest-reviews', async (req, res) => {
     const { id } = req.params
-    const { rows } = await db.query('SELECT * FROM restaurant_review WHERE restaurant_review.restaurant_id = $1 ORDER BY review_id DESC', [id]);
+    const { rows } = await db.query('SELECT restaurant_id, name, stars, title, content, review_datetime FROM restaurant_review, "user" WHERE restaurant_review.restaurant_id = $1 AND "user".user_id = restaurant_review.user_id ORDER BY review_id DESC', [id]);
     res.send(rows)
 })
 router.get('/:id/user-rest-reviews', async (req, res) => {
@@ -46,11 +45,13 @@ router.get('/:id/user-rest-reviews', async (req, res) => {
   const rows = (await db.query('SELECT * FROM restaurant_review WHERE restaurant_review.user_id = $1', [id])).rows;
   res.send(rows)
 })
-router.get('/:id', async (req, res) => {
-    const { id } = req.params.id
-    const { rows } = await db.query('SELECT COUNT(*), category FROM restaurant WHERE category = $1 GROUP BY category', [id]);
-    res.send(rows)
+
+router.get('/:id/reviews/count', async (req, res) => {
+  const { id } = req.params
+  const { rows } = await db.query('SELECT count(*) FROM restaurant_review WHERE restaurant_id = $1', [id]);
+  res.send(rows[0])
 })
+
 
 /* GET FOOD ITEMS WHICH WERE INCLUDED IN ALL ORDERS OF THE RESTAURANT */
 
@@ -79,22 +80,43 @@ router.get('/:id/division', async (req, res) => {
       res.send(division.rows)
 })
 
-router.post("/:id/review", async (req, res) => {
-  const restaurant_id = req.params.id
+router.post("/", async (req, res) => {
     // Verify user is signed in with a proper authentication token
     const token = req.headers['authorization']
     if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
     try {
       const {id} = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET)
   
-      const { title, stars, content} = req.body
+      const { restaurant_id, stars, content} = req.body
 
-      const review_id = (await db.query('INSERT INTO "restaurant_review"(restaurant_id, user_id, stars, title, content) VALUES ($1, $2, $3, $4, $5) RETURNING *', [restaurant_id, id, stars, title, content])).rows[0].review_id
+      const review_id = (await db.query('INSERT INTO "restaurant_review" (restaurant_id, user_id, restaurant_review.stars, restaurant_review.content) VALUES ($1, $2, $3, $4)', [restaurant_id, id, stars, content])).rows[0].review_id
   
       console.log(review_id)
       res.status(200).send({review_id})
+      const { rows } = await db.query('SELECT name, email, phone_num FROM "user" WHERE user_id = $1', [id])
+      res.send(rows[0])
     } catch (e) {
       console.log(e)
       return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
     }
   })
+
+  router.post("/:id/review", async (req, res) => {
+    const restaurant_id = req.params.id
+      // Verify user is signed in with a proper authentication token
+      const token = req.headers['authorization']
+      if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
+      try {
+        const {id} = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET)
+    
+        const { title, stars, content} = req.body
+  
+        const review_id = (await db.query('INSERT INTO "restaurant_review"(restaurant_id, user_id, stars, title, content) VALUES ($1, $2, $3, $4, $5) RETURNING *', [restaurant_id, id, stars, title, content])).rows[0].review_id
+    
+        console.log(review_id)
+        res.status(200).send({review_id})
+      } catch (e) {
+        console.log(e)
+        return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+      }
+    })

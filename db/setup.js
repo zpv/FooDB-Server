@@ -48,6 +48,7 @@ module.exports = async () => {
       description TEXT,
       price DECIMAL(5,2),
       type  VARCHAR(45),
+      img_url VARCHAR(65535),
 
       PRIMARY KEY (name, restaurant_id),
       FOREIGN KEY (restaurant_id)
@@ -145,21 +146,6 @@ module.exports = async () => {
         REFERENCES "menu_item"(name, restaurant_id)
     );`)
 
-  await db.query(`CREATE TABLE "payment_info"
-    (
-      card_num 			VARCHAR(45) NOT NULL,
-      user_id					INTEGER NOT NULL,
-      name  					VARCHAR(45),	
-      exp_date 				TIMESTAMP,
-      cvc 					VARCHAR(4),
-
-
-      PRIMARY KEY (card_num, user_id),
-      FOREIGN KEY (user_id)
-        REFERENCES "user"(user_id)
-        ON DELETE CASCADE
-    );`)
-
   await db.query(`CREATE TABLE "restaurant_review"
     (
       review_id 		  SERIAL,
@@ -175,8 +161,29 @@ module.exports = async () => {
         REFERENCES "restaurant"(restaurant_id)
         ON DELETE CASCADE,
       FOREIGN KEY (user_id)
-        REFERENCES "user"(user_id)
+        REFERENCES "user"(user_id) 
+        ON DELETE CASCADE
     );`)
+
+    // RESTAURANT RATING TRIGGER
+
+    await db.query(`
+    CREATE OR REPLACE FUNCTION update_rating() 
+      RETURNS trigger AS $update_rating$
+      BEGIN
+      UPDATE restaurant
+        SET rating = (SELECT AVG(stars) FROM restaurant_review
+                            WHERE restaurant_review.restaurant_id = restaurant.restaurant_id)
+        WHERE restaurant_id = NEW.restaurant_id;
+        RETURN NEW;
+      END;
+      $update_rating$ LANGUAGE plpgsql;
+    `)
+  
+    await db.query(`CREATE TRIGGER computeRating
+    AFTER INSERT ON restaurant_review
+        FOR EACH ROW
+          EXECUTE FUNCTION update_rating()`)
 
   await db.query(`CREATE TABLE "driver_review"
     (
@@ -192,16 +199,17 @@ module.exports = async () => {
         ON DELETE CASCADE,
       FOREIGN KEY (user_id)
         REFERENCES "user"(user_id)
+        ON DELETE CASCADE
     );`)
-
-
-
 
 
   await db.query(`INSERT INTO "restaurant" (restaurant_id, name, address, owner, category, rating, lat, lon, img_url)
     VALUES  ('1',  'Steveston Fisher', '3 Avenue, Richmond BC','Steven', 'Fast Food', 4.54, 49.124148, -123.186580, 'https://i.imgur.com/R9655as.png'),
             ('2', 'Mercante' ,'6388 University Blvd, Vancouver', 'UBCFood', 'Fast Food', 3.10, 49.263700, -123.255000, 'https://i.imgur.com/9EEv4Ne.jpg'),
-            ('3', 'Ronald McDonald''s Fun House' ,'3308 W Broadway, Vancouver', 'McDees', 'Fast Food', 5, 49.264104, -123.178065, 'https://i.imgur.com/fpWQJKa.png');`)
+            ('3', 'Ronald McDonald''s Fun House' ,'3308 W Broadway, Vancouver', 'McDees', 'Fast Food', 5, 49.264104, -123.178065, 'https://i.imgur.com/fpWQJKa.png'),
+            ('4', 'Santouka Ramen', '1690 Robson St, Vancouver, BC V6G 1C7', 'Hitoshi', 'Japanese', '5', '49.290123', '-123.133711', 'https://imgur.com/crkzGiD.png'),
+            ('5', 'Ajisai Sushi Bar', '2081 W 42nd Ave, Vancouver, BC V6M 3V3', 'Takashi', 'Japanese', '4.5', '49.233910', '-123.153740', 'https://imgur.com/oMjx5oc.png'),
+            ('6', 'Medina Cafe', '780 Richards St, Vancouver, BC V6B 3A4', 'Joshua', 'Brunch', '4.9', '49.279030', '-123.119430', 'https://imgur.com/j6JI8b5.png');`)
 
   await db.query(`INSERT INTO "driver" (name, email, password, phone_num, lat, lon)
     VALUES  ('Josh', 'ericliu7722@gmail.com', 'ILoveDelivery', '7789195177', '0', '0'),
@@ -217,22 +225,31 @@ module.exports = async () => {
             ('1', '123456-1', '2015-06-22 19:10:25-07'),
             ('2', '223456-0', '2016-07-22 19:10:25-07');`)
 
-  await db.query(`INSERT INTO "menu_item" (name, restaurant_id, availability, has_allergens, description, price, type)
-    VALUES  ('Fish Filet', 1, true, true, 'Wha she order?', 24.54, 'Seafood'),
-            ('Fish Sticks', 1, true, true, 'Delicious sticks of fish', 13.21, 'Seafood'),
-            ('Fish Food', 1, true, true, 'Delicious food for fish', 6.56, 'Seafood'),
-            ('Salmon Sashimi', 1, true, true, 'Delicious sashimi', 21.50, 'Seafood'),
-            ('Crepe', 1, true, true, 'Delicious crepe', 2.54, 'Pastries'),
-            ('Fancy Pizza', 2, true, true, 'Overpriced pizza', 12.10, 'Pizza'),
-            ('Fancy Pizza 2', 2, true, true, 'Overpriced pizza 2', 15.60, 'Pizza'),
-            ('McDouble', 3, true, true, 'Cheaper version of the double cheeseburger', 6.56, 'Seafood'),
-            ('Cheeseburger', 3, true, true, 'Yum', 21.50, 'Seafood'),
-            ('Big Mac', 3, true, true, 'Bigger than a regular Mac', 2.54, 'Pastries'),
-            ('Double Cheeseburger', 3, true, true, 'Just like a cheeseburger, but double', 12.10, 'Pizza'),
-            ('Filet o'' Fish', 3, true, true, 'Delicious filet o fish with creamy sauce', 6.56, 'Seafood'),
-            ('Chicken Nuggets', 3, true, true, 'Good for snacking on', 21.50, 'Seafood'),
-            ('French Fries', 3, true, true, 'French-style frites', 2.54, 'Pastries'),
-            ('"Coke"', 3, true, true, 'Columbian style "coke"', 12.10, 'Pizza');
+  await db.query(`INSERT INTO "menu_item" (name, restaurant_id, availability, has_allergens, description, price, type, img_url)
+    VALUES  ('Fish Filet', 1, true, true, 'Wha she order?', 24.54, 'Seafood', 'https://i.imgur.com/R9655as.png'),
+            ('Fish Sticks', 1, true, true, 'Delicious sticks of fish', 13.21, 'Seafood', ''),
+            ('Fish Food', 1, true, true, 'Delicious food for fish', 6.56, 'Seafood', ''),
+            ('Salmon Sashimi', 1, true, true, 'Delicious sashimi', 21.50, 'Seafood', ''),
+            ('Crepe', 1, true, true, 'Delicious crepe', 2.54, 'Pastries', ''),
+            ('Fancy Pizza', 2, true, true, 'Overpriced pizza', 12.10, 'Pizza', ''),
+            ('Fancy Pizza 2', 2, true, true, 'Overpriced pizza 2', 15.60, 'Pizza', ''),
+            ('McDouble', 3, true, true, 'Cheaper version of the double cheeseburger', 6.56, 'Seafood', ''),
+            ('Cheeseburger', 3, true, true, 'Yum', 21.50, 'Seafood', ''),
+            ('Big Mac', 3, true, true, 'Bigger than a regular Mac', 2.54, 'Pastries', ''),
+            ('Double Cheeseburger', 3, true, true, 'Just like a cheeseburger, but double', 12.10, 'Pizza', ''),
+            ('Filet o'' Fish', 3, true, true, 'Delicious filet o fish with creamy sauce', 6.56, 'Seafood', ''),
+            ('Chicken Nuggets', 3, true, true, 'Good for snacking on', 21.50, 'Seafood', ''),
+            ('French Fries', 3, true, true, 'French-style frites', 2.54, 'Pastries', ''),
+            ('"Coke"', 3, true, true, 'Columbian style "coke"', 12.10, 'Pizza', ''),
+            ('Shio Ramen', '4', true, false, 'Umami Ramen', 10.99, 'Ramen', ''),
+            ('Miso Ramen', '4', true, false, 'Miso flavour ramen', 10.99, 'Ramen', ''),
+            ('Shoyu Ramen', '4', true, false, 'Soy Sauce flavour ramen', 10.99, 'Ramen', ''),
+            ('Kara-miso Ramen', '4', true, false, 'Spicy Miso Ramen', 10.99, 'Ramen', ''),
+            ('California Roll', '5', true, false, 'Very Nice Sushi', 3.99, 'Japanese', ''),
+            ('Unagi Don', '5', true, false, 'Melt in your mouth unagi', 20.99, 'Japanese', ''),
+            ('Uni Don', '5', true, false, 'Custard of the sea', 30.99, 'Japanese', ''),
+            ('Meatballs', '6', true, true, 'Mediterranean Meat Balls', 10.99, 'Brunch', ''),
+            ('Blueberry Waffles', '6', true, false, 'These waffles are blue and beautiful', 5.99, 'Brunch', '');
             `)
 
   await db.query(`INSERT INTO "user" (name, email, password, phone_num, address) 
@@ -247,9 +264,63 @@ module.exports = async () => {
     The modern style thin noodles are not my top preference, but it is more popular these days.
     ')`)
 
-    await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
-    VALUES  (1, 1, 5, 'Savoury. Yummy.', 'Now is there really another Modern Vietnamese restaurant in Vancouver that is more happening than here? The answer is NO. There is not. Anh and Chi has done an excellent job creating a bright and fresh and vibrant atmosphere while serving darn good authentic Vietnamese. The food is decorative, and the restaurant has a great vibe. Some of my favorite dishes here: Cay Me - Tofu salad roll is excellent! 
-    ')`)
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+  VALUES  (1, 1, 5, 'Savoury. Yummy.', 'Now is there really another Modern Vietnamese restaurant in Vancouver that is more happening than here? The answer is NO. There is not. Anh and Chi has done an excellent job creating a bright and fresh and vibrant atmosphere while serving darn good authentic Vietnamese. The food is decorative, and the restaurant has a great vibe. Some of my favorite dishes here: Cay Me - Tofu salad roll is excellent! 
+  ')`)
+
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+  VALUES  (2, 1, 2, 
+  'Powerfullly Terrible', 
+  'I love how vigorously the Asian dude cuts apart my pizza. However, the cuts are often uneven, terrible!
+  ')`)
+
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+  VALUES  (2, 1, 3, 
+  'Affordable student option', 
+  'Cheap but not always the best, the quality changes a lot
+  ')`)
+
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+  VALUES  (2, 1, 5, 
+  'Traditional Italian Pizza', 
+  'Simply exquisite, nothing more
+  ')`)
+
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+  VALUES  (3, 1, 5, 
+  'Purest Coke I have every tried', 
+  'The Ronald House Columbian coke puts even Pablo Escobar to shame. Highly recommended
+  ')`)
+
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+  VALUES  (3, 1, 5, 
+  'You will not want any other coke', 
+  'I have only had coke from Ronald House ever since I tried it.
+  ')`)
+
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+  VALUES  (4, 1, 3, 
+  'Better than Jinya', 
+  'At least I did not get food poisoning from Santouka..
+  ')`)
+
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+  VALUES  (4, 1, 5, 
+  'Rich Broth', 
+  'The broth tastes like its been boiled for days. Simply beautiful, highly recommend the shio ramen.
+  ')`)
+
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+  VALUES  (5, 1, 1, 
+  'Their price was too expensive', 
+  'Uni don is way too expensive, so was the unagi done.
+  ')`)
+
+  await db.query(`INSERT INTO "restaurant_review" (restaurant_id, user_id, stars, title, content)
+  VALUES  (6, 1, 4, 
+  'Love their Blue Waffles', 
+  'The blueberry served here is not only beuaitful, but also extremely tasty. The best waffle I ever had.
+  ')`)
 
   await db.query(`INSERT INTO "driver_review" (driver_id, review_id, user_id, stars, review_datetime)
     VALUES  ('1', '1', '1', '5', '2016-06-22 19:10:25-07'),
