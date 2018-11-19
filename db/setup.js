@@ -145,21 +145,6 @@ module.exports = async () => {
         REFERENCES "menu_item"(name, restaurant_id)
     );`)
 
-  await db.query(`CREATE TABLE "payment_info"
-    (
-      card_num 			VARCHAR(45) NOT NULL,
-      user_id					INTEGER NOT NULL,
-      name  					VARCHAR(45),	
-      exp_date 				TIMESTAMP,
-      cvc 					VARCHAR(4),
-
-
-      PRIMARY KEY (card_num, user_id),
-      FOREIGN KEY (user_id)
-        REFERENCES "user"(user_id)
-        ON DELETE CASCADE
-    );`)
-
   await db.query(`CREATE TABLE "restaurant_review"
     (
       review_id 		  SERIAL,
@@ -175,8 +160,29 @@ module.exports = async () => {
         REFERENCES "restaurant"(restaurant_id)
         ON DELETE CASCADE,
       FOREIGN KEY (user_id)
-        REFERENCES "user"(user_id)
+        REFERENCES "user"(user_id) 
+        ON DELETE CASCADE
     );`)
+
+    // RESTAURANT RATING TRIGGER
+
+    await db.query(`
+    CREATE OR REPLACE FUNCTION update_rating() 
+      RETURNS trigger AS $update_rating$
+      BEGIN
+      UPDATE restaurant
+        SET rating = (SELECT AVG(stars) FROM restaurant_review
+                            WHERE restaurant_review.restaurant_id = restaurant.restaurant_id)
+        WHERE restaurant_id = NEW.restaurant_id;
+        RETURN NEW;
+      END;
+      $update_rating$ LANGUAGE plpgsql;
+    `)
+  
+    await db.query(`CREATE TRIGGER computeRating
+    AFTER INSERT ON restaurant_review
+        FOR EACH ROW
+          EXECUTE FUNCTION update_rating()`)
 
   await db.query(`CREATE TABLE "driver_review"
     (
@@ -192,16 +198,17 @@ module.exports = async () => {
         ON DELETE CASCADE,
       FOREIGN KEY (user_id)
         REFERENCES "user"(user_id)
+        ON DELETE CASCADE
     );`)
-
-
-
 
 
   await db.query(`INSERT INTO "restaurant" (restaurant_id, name, address, owner, category, rating, lat, lon, img_url)
     VALUES  ('1',  'Steveston Fisher', '3 Avenue, Richmond BC','Steven', 'Fast Food', 4.54, 49.124148, -123.186580, 'https://i.imgur.com/R9655as.png'),
             ('2', 'Mercante' ,'6388 University Blvd, Vancouver', 'UBCFood', 'Fast Food', 3.10, 49.263700, -123.255000, 'https://i.imgur.com/9EEv4Ne.jpg'),
-            ('3', 'Ronald McDonald''s Fun House' ,'3308 W Broadway, Vancouver', 'McDees', 'Fast Food', 5, 49.264104, -123.178065, 'https://i.imgur.com/fpWQJKa.png');`)
+            ('3', 'Ronald McDonald''s Fun House' ,'3308 W Broadway, Vancouver', 'McDees', 'Fast Food', 5, 49.264104, -123.178065, 'https://i.imgur.com/fpWQJKa.png'),
+            ('4', 'Santouka Ramen', '1690 Robson St, Vancouver, BC V6G 1C7', 'Hitoshi', 'Japanese', '5', '49.290123', '-123.133711', 'https://imgur.com/crkzGiD'),
+            ('5', 'Ajisai Sushi Bar', '2081 W 42nd Ave, Vancouver, BC V6M 3V3', 'Takashi', 'Japanese', '4.5', '49.233910', '-123.153740', 'https://imgur.com/oMjx5oc'),
+            ('6', 'Medina Cafe', '780 Richards St, Vancouver, BC V6B 3A4', 'Joshua', 'Brunch', '4.9', '49.279030', '-123.119430', 'https://imgur.com/j6JI8b5');`)
 
   await db.query(`INSERT INTO "driver" (name, email, password, phone_num, lat, lon)
     VALUES  ('Josh', 'ericliu7722@gmail.com', 'ILoveDelivery', '7789195177', '0', '0'),
@@ -232,7 +239,16 @@ module.exports = async () => {
             ('Filet o'' Fish', 3, true, true, 'Delicious filet o fish with creamy sauce', 6.56, 'Seafood'),
             ('Chicken Nuggets', 3, true, true, 'Good for snacking on', 21.50, 'Seafood'),
             ('French Fries', 3, true, true, 'French-style frites', 2.54, 'Pastries'),
-            ('"Coke"', 3, true, true, 'Columbian style "coke"', 12.10, 'Pizza');
+            ('"Coke"', 3, true, true, 'Columbian style "coke"', 12.10, 'Pizza'),
+            ('Shio Ramen', '4', true, false, 'Umami Ramen', 10.99, 'Ramen'),
+            ('Miso Ramen', '4', true, false, 'Miso flavour ramen', 10.99, 'Ramen'),
+            ('Shoyu Ramen', '4', true, false, 'Soy Sauce flavour ramen', 10.99, 'Ramen'),
+            ('Kara-miso Ramen', '4', true, false, 'Spicy Miso Ramen', 10.99, 'Ramen'),
+            ('California Roll', '5', true, false, 'Very Nice Sushi', 3.99, 'Japanese'),
+            ('Unagi Don', '5', true, false, 'Melt in your mouth unagi', 20.99, 'Japanese'),
+            ('Uni Don', '5', true, false, 'Custard of the sea', 30.99, 'Japanese'),
+            ('Meatballs', '6', true, true, 'Mediterranean Meat Balls', 10.99, 'Brunch'),
+            ('Blueberry Waffles', '6', true, false, 'These waffles are blue and beautiful', 5.99, 'Brunch');
             `)
 
   await db.query(`INSERT INTO "user" (name, email, password, phone_num, address) 
