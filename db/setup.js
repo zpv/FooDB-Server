@@ -175,7 +175,8 @@ module.exports = async () => {
         REFERENCES "restaurant"(restaurant_id)
         ON DELETE CASCADE,
       FOREIGN KEY (user_id)
-        REFERENCES "user"(user_id)
+        REFERENCES "user"(user_id) 
+        ON DELETE CASCADE
     );`)
 
   await db.query(`CREATE TABLE "driver_review"
@@ -192,6 +193,7 @@ module.exports = async () => {
         ON DELETE CASCADE,
       FOREIGN KEY (user_id)
         REFERENCES "user"(user_id)
+        ON DELETE CASCADE
     );`)
 
 
