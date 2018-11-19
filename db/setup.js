@@ -206,9 +206,9 @@ module.exports = async () => {
     VALUES  ('1',  'Steveston Fisher', '3 Avenue, Richmond BC','Steven', 'Fast Food', 4.54, 49.124148, -123.186580, 'https://i.imgur.com/R9655as.png'),
             ('2', 'Mercante' ,'6388 University Blvd, Vancouver', 'UBCFood', 'Fast Food', 3.10, 49.263700, -123.255000, 'https://i.imgur.com/9EEv4Ne.jpg'),
             ('3', 'Ronald McDonald''s Fun House' ,'3308 W Broadway, Vancouver', 'McDees', 'Fast Food', 5, 49.264104, -123.178065, 'https://i.imgur.com/fpWQJKa.png'),
-            ('4', 'Santouka Ramen', '1690 Robson St, Vancouver, BC V6G 1C7', 'Hitoshi', 'Japanese', '5', '49.290123', '-123.133711', 'https://imgur.com/crkzGiD'),
-            ('5', 'Ajisai Sushi Bar', '2081 W 42nd Ave, Vancouver, BC V6M 3V3', 'Takashi', 'Japanese', '4.5', '49.233910', '-123.153740', 'https://imgur.com/oMjx5oc'),
-            ('6', 'Medina Cafe', '780 Richards St, Vancouver, BC V6B 3A4', 'Joshua', 'Brunch', '4.9', '49.279030', '-123.119430', 'https://imgur.com/j6JI8b5');`)
+            ('4', 'Santouka Ramen', '1690 Robson St, Vancouver, BC V6G 1C7', 'Hitoshi', 'Japanese', '5', '49.290123', '-123.133711', 'https://imgur.com/crkzGiD.png'),
+            ('5', 'Ajisai Sushi Bar', '2081 W 42nd Ave, Vancouver, BC V6M 3V3', 'Takashi', 'Japanese', '4.5', '49.233910', '-123.153740', 'https://imgur.com/oMjx5oc.png'),
+            ('6', 'Medina Cafe', '780 Richards St, Vancouver, BC V6B 3A4', 'Joshua', 'Brunch', '4.9', '49.279030', '-123.119430', 'https://imgur.com/j6JI8b5.png');`)
 
   await db.query(`INSERT INTO "driver" (name, email, password, phone_num, lat, lon)
     VALUES  ('Josh', 'ericliu7722@gmail.com', 'ILoveDelivery', '7789195177', '0', '0'),
