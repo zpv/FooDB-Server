@@ -72,13 +72,27 @@ router.post('/edit', async (req, res) => {
 })
 
 router.post('/delete', async (req, res) => {
-  // const { name, email, password, phone, address } = req.body
+  const { password } = req.body
   const token = req.headers['authorization']
+  console.log(req.headers)
     if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
   try {
     const {id} = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET)
 
-    const { rows } = await db.query('DELETE FROM "user" WHERE email = $1 AND password = $2 AND user_id = $3', [email, password, id])
+    let { rows } = await db.query('SELECT password FROM "user" WHERE user_id = $1', [id])
+ 
+    if (!rows[0]) {
+      return res.status(404).send('No user found.')
+    }
+
+    if(bcrypt.compareSync(password, rows[0].password)) {
+      await db.query('DELETE FROM "user" WHERE user_id = $1', [id])
+      res.status(200).send()
+    } else {
+      res.status(401).send({ auth: false, token: null })
+    }
+
+
     //const userId = rows[0].user_id
     
     res.status(200).send(rows[0])
