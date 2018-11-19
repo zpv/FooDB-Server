@@ -42,12 +42,6 @@ router.get('/:id/reviews', async (req, res) => {
     res.send(rows)
 })
 
-router.get('/:id', async (req, res) => {
-    const { id } = req.params.id
-    const { rows } = await db.query('SELECT COUNT(*), category FROM restaurant WHERE category = $1 GROUP BY category', [id]);
-    res.send(rows)
-})
-
 /* GET FOOD ITEMS WHICH WERE INCLUDED IN ALL ORDERS OF THE RESTAURANT */
 
 router.get('/:id/division', async (req, res) => {
