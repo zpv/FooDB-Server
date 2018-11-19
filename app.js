@@ -9,9 +9,7 @@ const port = 8080
 
 const app = express()
 app.use(bodyParser.json())
-if (dev) {
-    app.use(cors())
-}
+app.use(cors())
 mountRoutes(app)
 
 app.listen(port, () => {console.log("FooDB Backend Started")})

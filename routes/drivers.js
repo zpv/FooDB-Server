@@ -57,6 +57,14 @@ router.post('/login', async (req, res) => {
   }
 })
 
+router.post('/edit', async (req, res) => {
+  const { id, name, email, password, phone } = req.body
+  const hashedPassword = bcrypt.hashSync(password, 8)
+  await db.query('UPDATE "user" SET name = $1, email = $2, password = $3, phone_num = $4 WHERE user_id = $5', [name, email, hashedPassword, phone, id])
+  const { rows } = await db.query('SELECT * FROM driver WHERE driver_id = $1', [id])
+  res.status(200).send(rows[0])
+})
+
 //
 router.post('/update/phone', async (req, res) => {
   const { id, phone} = req.body
@@ -87,7 +95,11 @@ router.get('/:id/orders', async (req, res) => {
   const { rows } = await db.query('SELECT "restaurant".address as r_address, * FROM "restaurant", "order" WHERE "restaurant".restaurant_id = "order".restaurant_id AND driver_id = $1 AND delivered_datetime IS NULL', [id]);
   res.send(rows)
 })
-
+router.get('/:id/allorders', async (req, res) => {
+  const { id } = req.params
+  const { rows } = await db.query('SELECT "restaurant".address as r_address, * FROM "restaurant", "order" WHERE "restaurant".restaurant_id = "order".restaurant_id AND driver_id = $1', [id]);
+  res.send(rows)
+})
 router.delete("/delete", async (req, res) => {
   // Verify user is signed in with a proper authentication token
     const {email} = req.body
