@@ -52,6 +52,25 @@ router.post('/register', async (req, res) => {
   }
 })
 
+router.post('/edit', async (req, res) => {
+  const { name, email, password, phone, address } = req.body 
+
+  const token = req.headers['authorization']
+  if (!token) return res.status(401).send({auth: false, message: 'No token provided'})
+  try {
+    const hashedPassword = bcrypt.hashSync(password, 8)
+
+    const { id } = jwt.verify(token.split(" ")[1], process.env.SESSION_SECRET)
+    await db.query('UPDATE "user" SET name = $1, email = $2, password = $3, phone_num = $4, address = $5 WHERE user_id = $6', [name, email, hashedPassword, phone, address, id])
+
+    res.status(200).send()
+    
+  } catch (e) {
+    console.log(e)
+    res.status(500).send({auth: false, error: 'There was an error editing your account.'})
+  }
+})
+
 router.post('/delete', async (req, res) => {
   // const { name, email, password, phone, address } = req.body
   const token = req.headers['authorization']
