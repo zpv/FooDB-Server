@@ -48,6 +48,7 @@ module.exports = async () => {
       description TEXT,
       price DECIMAL(5,2),
       type  VARCHAR(45),
+      img_url VARCHAR(65535),
 
       PRIMARY KEY (name, restaurant_id),
       FOREIGN KEY (restaurant_id)
@@ -224,31 +225,31 @@ module.exports = async () => {
             ('1', '123456-1', '2015-06-22 19:10:25-07'),
             ('2', '223456-0', '2016-07-22 19:10:25-07');`)
 
-  await db.query(`INSERT INTO "menu_item" (name, restaurant_id, availability, has_allergens, description, price, type)
-    VALUES  ('Fish Filet', 1, true, true, 'Wha she order?', 24.54, 'Seafood'),
-            ('Fish Sticks', 1, true, true, 'Delicious sticks of fish', 13.21, 'Seafood'),
-            ('Fish Food', 1, true, true, 'Delicious food for fish', 6.56, 'Seafood'),
-            ('Salmon Sashimi', 1, true, true, 'Delicious sashimi', 21.50, 'Seafood'),
-            ('Crepe', 1, true, true, 'Delicious crepe', 2.54, 'Pastries'),
-            ('Fancy Pizza', 2, true, true, 'Overpriced pizza', 12.10, 'Pizza'),
-            ('Fancy Pizza 2', 2, true, true, 'Overpriced pizza 2', 15.60, 'Pizza'),
-            ('McDouble', 3, true, true, 'Cheaper version of the double cheeseburger', 6.56, 'Seafood'),
-            ('Cheeseburger', 3, true, true, 'Yum', 21.50, 'Seafood'),
-            ('Big Mac', 3, true, true, 'Bigger than a regular Mac', 2.54, 'Pastries'),
-            ('Double Cheeseburger', 3, true, true, 'Just like a cheeseburger, but double', 12.10, 'Pizza'),
-            ('Filet o'' Fish', 3, true, true, 'Delicious filet o fish with creamy sauce', 6.56, 'Seafood'),
-            ('Chicken Nuggets', 3, true, true, 'Good for snacking on', 21.50, 'Seafood'),
-            ('French Fries', 3, true, true, 'French-style frites', 2.54, 'Pastries'),
-            ('"Coke"', 3, true, true, 'Columbian style "coke"', 12.10, 'Pizza'),
-            ('Shio Ramen', '4', true, false, 'Umami Ramen', 10.99, 'Ramen'),
-            ('Miso Ramen', '4', true, false, 'Miso flavour ramen', 10.99, 'Ramen'),
-            ('Shoyu Ramen', '4', true, false, 'Soy Sauce flavour ramen', 10.99, 'Ramen'),
-            ('Kara-miso Ramen', '4', true, false, 'Spicy Miso Ramen', 10.99, 'Ramen'),
-            ('California Roll', '5', true, false, 'Very Nice Sushi', 3.99, 'Japanese'),
-            ('Unagi Don', '5', true, false, 'Melt in your mouth unagi', 20.99, 'Japanese'),
-            ('Uni Don', '5', true, false, 'Custard of the sea', 30.99, 'Japanese'),
-            ('Meatballs', '6', true, true, 'Mediterranean Meat Balls', 10.99, 'Brunch'),
-            ('Blueberry Waffles', '6', true, false, 'These waffles are blue and beautiful', 5.99, 'Brunch');
+  await db.query(`INSERT INTO "menu_item" (name, restaurant_id, availability, has_allergens, description, price, type, img_url)
+    VALUES  ('Fish Filet', 1, true, true, 'Wha she order?', 24.54, 'Seafood', 'https://i.imgur.com/R9655as.png'),
+            ('Fish Sticks', 1, true, true, 'Delicious sticks of fish', 13.21, 'Seafood', ''),
+            ('Fish Food', 1, true, true, 'Delicious food for fish', 6.56, 'Seafood', ''),
+            ('Salmon Sashimi', 1, true, true, 'Delicious sashimi', 21.50, 'Seafood', ''),
+            ('Crepe', 1, true, true, 'Delicious crepe', 2.54, 'Pastries', ''),
+            ('Fancy Pizza', 2, true, true, 'Overpriced pizza', 12.10, 'Pizza', ''),
+            ('Fancy Pizza 2', 2, true, true, 'Overpriced pizza 2', 15.60, 'Pizza', ''),
+            ('McDouble', 3, true, true, 'Cheaper version of the double cheeseburger', 6.56, 'Seafood', ''),
+            ('Cheeseburger', 3, true, true, 'Yum', 21.50, 'Seafood', ''),
+            ('Big Mac', 3, true, true, 'Bigger than a regular Mac', 2.54, 'Pastries', ''),
+            ('Double Cheeseburger', 3, true, true, 'Just like a cheeseburger, but double', 12.10, 'Pizza', ''),
+            ('Filet o'' Fish', 3, true, true, 'Delicious filet o fish with creamy sauce', 6.56, 'Seafood', ''),
+            ('Chicken Nuggets', 3, true, true, 'Good for snacking on', 21.50, 'Seafood', ''),
+            ('French Fries', 3, true, true, 'French-style frites', 2.54, 'Pastries', ''),
+            ('"Coke"', 3, true, true, 'Columbian style "coke"', 12.10, 'Pizza', ''),
+            ('Shio Ramen', '4', true, false, 'Umami Ramen', 10.99, 'Ramen', ''),
+            ('Miso Ramen', '4', true, false, 'Miso flavour ramen', 10.99, 'Ramen', ''),
+            ('Shoyu Ramen', '4', true, false, 'Soy Sauce flavour ramen', 10.99, 'Ramen', ''),
+            ('Kara-miso Ramen', '4', true, false, 'Spicy Miso Ramen', 10.99, 'Ramen', ''),
+            ('California Roll', '5', true, false, 'Very Nice Sushi', 3.99, 'Japanese', ''),
+            ('Unagi Don', '5', true, false, 'Melt in your mouth unagi', 20.99, 'Japanese', ''),
+            ('Uni Don', '5', true, false, 'Custard of the sea', 30.99, 'Japanese', ''),
+            ('Meatballs', '6', true, true, 'Mediterranean Meat Balls', 10.99, 'Brunch', ''),
+            ('Blueberry Waffles', '6', true, false, 'These waffles are blue and beautiful', 5.99, 'Brunch', '');
             `)
 
   await db.query(`INSERT INTO "user" (name, email, password, phone_num, address) 
