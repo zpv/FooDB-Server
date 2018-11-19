@@ -145,21 +145,6 @@ module.exports = async () => {
         REFERENCES "menu_item"(name, restaurant_id)
     );`)
 
-  await db.query(`CREATE TABLE "payment_info"
-    (
-      card_num 			VARCHAR(45) NOT NULL,
-      user_id					INTEGER NOT NULL,
-      name  					VARCHAR(45),	
-      exp_date 				TIMESTAMP,
-      cvc 					VARCHAR(4),
-
-
-      PRIMARY KEY (card_num, user_id),
-      FOREIGN KEY (user_id)
-        REFERENCES "user"(user_id)
-        ON DELETE CASCADE
-    );`)
-
   await db.query(`CREATE TABLE "restaurant_review"
     (
       review_id 		  SERIAL,
@@ -195,9 +180,6 @@ module.exports = async () => {
         REFERENCES "user"(user_id)
         ON DELETE CASCADE
     );`)
-
-
-
 
 
   await db.query(`INSERT INTO "restaurant" (restaurant_id, name, address, owner, category, rating, lat, lon, img_url)
