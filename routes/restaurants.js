@@ -42,11 +42,11 @@ router.get('/:id/reviews', async (req, res) => {
     res.send(rows)
 })
 
-// gets all reviews for that restaurant
+// Get Review Count
 router.get('/:id/reviews/count', async (req, res) => {
   const { id } = req.params
-  const { rows } = await db.query('SELECT count(*) FROM restaurant_review WHERE restaurant_id = $1 ORDER BY review_id DESC', [id]);
-  res.send(rows)
+  const { rows } = await db.query('SELECT COUNT(*) FROM restaurant_review WHERE restaurant_id = $1', [id]);
+  res.send(rows[0])
 })
 
 router.get('/:id', async (req, res) => {
