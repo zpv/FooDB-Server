@@ -38,7 +38,7 @@ router.get('/:id/orders', async (req, res) => {
 // gets all reviews for that restaurant
 router.get('/:id/reviews', async (req, res) => {
     const { id } = req.params
-    const { rows } = await db.query('SELECT * FROM restaurant_review WHERE restaurant_review.restaurant_id = $1 ORDER BY review_id DESC', [id]);
+    const { rows } = await db.query('SELECT restaurant_id, name, stars, title, content, review_datetime FROM restaurant_review, "user" WHERE restaurant_review.restaurant_id = $1 AND "user".user_id = restaurant_review.user_id ORDER BY review_id DESC', [id]);
     res.send(rows)
 })
 
