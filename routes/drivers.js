@@ -75,7 +75,7 @@ router.post('/update/phone', async (req, res) => {
 // Endpoint for getting deliverer info
 router.get('/:id', async (req, res) => {
   const { id } = req.params
-  const { rows } = await db.query('SELECT name, phone_num, lat, lon FROM driver WHERE driver_id = $1', [id])
+  const { rows } = await db.query('SELECT name, phone_num, email, lat, lon FROM driver WHERE driver_id = $1', [id])
   res.send(rows[0])
 })
 
@@ -100,7 +100,7 @@ router.get('/:id/allorders', async (req, res) => {
   const { rows } = await db.query('SELECT "restaurant".address as r_address, * FROM "restaurant", "order" WHERE "restaurant".restaurant_id = "order".restaurant_id AND driver_id = $1', [id]);
   res.send(rows)
 })
-router.delete("/delete", async (req, res) => {
+router.post("/delete", async (req, res) => {
   // Verify user is signed in with a proper authentication token
     const {email} = req.body
     await db.query('DELETE FROM driver WHERE email = $1', [email])
