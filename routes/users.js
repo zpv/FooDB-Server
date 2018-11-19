@@ -52,14 +52,13 @@ router.post('/register', async (req, res) => {
   }
 })
 
-router.delete('/delete', async (req, res) => {
-  const { name, email, password, phone, address } = req.body
+router.post('/delete', async (req, res) => {
+  const { email} = req.body
 
   try {
-    const { rows } = await db.query('DELETE FROM "user" WHERE email = $1 AND password = $2', [email, password])
-    const userId = rows[0].user_id
-    const token = req.headers['authorization']
-    res.status(200).send({auth: true, token: token, uid: userId})
+    await db.query('DELETE FROM user WHERE email = $1', [email])
+   // const token = req.headers['authorization']
+    res.status(200).send({auth: true})
 
   } catch (e) {
     console.log(e)
@@ -69,6 +68,23 @@ router.delete('/delete', async (req, res) => {
     res.status(500).send({auth: false, error: 'There was an error deleting your account.'})
   }
 })
+
+// router.post('/update', async (req, res) => {
+//   const { name, email, password, phone, address } = req.body
+//   const hashedPassword = bcrypt.hashSync(password, 8)
+//   try {
+//     const { row } = await db.query('UPDATE user SET name = $1, email = $2, password = $3, phone_num = $4, address = $5',
+//        [name, email, hashedPassword, phone, address])
+//     const token = jwt.sign({id: userId}, process.env.SESSION_SECRET, {
+//       expiresIn: 86400 
+//       })// expires in 24 hours  
+//     res.status(200).send({auth: true, token: token, uid: userId})
+//   } catch(e) {
+//     console.log(e)
+//     res.status(500).send({auth: false, error: 'There was an error updating your account.'})
+
+//   }
+// })
 
 router.get('/:id/rest-reviews', async (req, res) => {
   const { id } = req.params
